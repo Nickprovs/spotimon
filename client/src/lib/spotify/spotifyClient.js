@@ -22,15 +22,15 @@ class SpotifyClient {
     return spotifyWebApi.getAccessToken() === true;
   }
 
-  async getSavedTracksAsync(maxTrackPullCount = 300) {
+  async getSavedTracksAsync(totalPullCount = 300) {
     let likedTracks = [];
     try {
-      let limit = 50;
+      let limit = Math.min(50, totalPullCount);
 
       const res = await spotifyWebApi.getMySavedTracks();
       const totalSavedCount = res.total;
 
-      for (let i = 0; i * limit < maxTrackPullCount && i * limit < totalSavedCount; i++) {
+      for (let i = 0; i * limit < totalPullCount && i * limit < totalSavedCount; i++) {
         const res = await spotifyWebApi.getMySavedTracks({ offset: i * limit, limit: limit });
         likedTracks.push(...res.items.map(o => o.track));
       }
@@ -67,7 +67,7 @@ class SpotifyClient {
     let sortedUniqueGenreData = [];
 
     for (let genreKey in uniqueGenreData)
-      sortedUniqueGenreData.push({ genre: genreKey, count: uniqueGenreData[genreKey] });
+      sortedUniqueGenreData.push({ name: genreKey, count: uniqueGenreData[genreKey] });
 
     sortedUniqueGenreData.sort((a, b) => {
       return b.count - a.count;

@@ -5,10 +5,10 @@ import nBodyProblem from "./lib/simulation/nBodyProblem";
 import Manifestation from "./lib/simulation/manifestation";
 
 const scale = 70;
-const radius = 4;
+const radius = 7;
 const trailLength = 35;
 const g = 39.5;
-const dt = 0.008; //0.005 years is equal to 1.825 days
+const dt = 0.005; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
 
 const masses = [
@@ -100,37 +100,77 @@ class App extends Component {
 
   componentDidMount() {
     this.ctx = this.canvas.getContext("2d");
+  }
+
+  beginAnimating() {
     this.populateManifestations(this.innerSolarSystem.masses);
     this.animate();
   }
 
   async handleGetNowPlaying() {
     const nowPlaying = await this.spotifyClient.getNowPlayingAsync();
-    console.log(nowPlaying);
-    this.setState({ nowPlaying });
+    if (nowPlaying) this.setState({ nowPlaying });
+  }
+
+  getRandomPositionData() {
+    const isNegativeX = Math.random() > 0.5;
+    const isNegativeY = Math.random() > 0.5;
+    const isNegativeVx = Math.random() > 0.5;
+    const isNegativeVy = Math.random() > 0.5;
+
+    let x = Math.random() * 2;
+    let y = Math.random() * 2;
+    const z = 0;
+    let vx = Math.random() * 4;
+    let vy = Math.random() * 4;
+    const vz = 0;
+
+    if (isNegativeVx) vx *= -1;
+    if (isNegativeVy) vy *= -1;
+    if (isNegativeX) x *= -1;
+    if (isNegativeY) y *= -1;
+
+    return { x, y, z, vx, vy, vz };
   }
 
   async handleFetchGenres() {
+    let uniqueGenreData = [];
     this.setState({ fetchingGenres: true });
     try {
-      const savedTracks = await this.spotifyClient.getSavedTracksAsync();
+      const savedTracks = await this.spotifyClient.getSavedTracksAsync(2);
       const savedArtists = await this.spotifyClient.getArtistsFromTracksAsync(savedTracks);
-      const uniqueGenreData = this.spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
+      uniqueGenreData = this.spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
       console.log(uniqueGenreData);
     } catch (ex) {
       console.log(ex);
     } finally {
       this.setState({ fetchingGenres: false });
     }
+
+    for (let genre of uniqueGenreData) {
+      const randData = this.getRandomPositionData();
+      this.innerSolarSystem.masses.push({
+        name: genre.name,
+        m: 3.0024584e-6 * genre.count,
+        x: randData.x,
+        y: randData.y,
+        z: randData.z,
+        vx: randData.vx,
+        vy: randData.vy,
+        vz: randData.vz
+      });
+    }
+
+    console.log(this.innerSolarSystem.masses);
+
+    this.beginAnimating();
   }
 
   populateManifestations(masses) {
-    console.log("Passing ctx", this.ctx);
     masses.forEach(mass => (mass["manifestation"] = new Manifestation(this.ctx, trailLength, radius)));
   }
 
   animate() {
-    console.log("test");
     this.innerSolarSystem.updatePositionVectors();
     this.innerSolarSystem.updateAccelerationVectors();
     this.innerSolarSystem.updateVelocityVectors();
@@ -150,6 +190,26 @@ class App extends Component {
         this.ctx.font = "14px Arial";
         this.ctx.fillText(massI.name, x + 12, y + 4);
         this.ctx.fill();
+      }
+
+      if (x < radius) {
+        massI.x = this.width - radius;
+        massI.vx /= 2;
+      }
+
+      if (x > this.width - radius) {
+        massI.x = radius;
+        massI.vx /= 2;
+      }
+
+      if (y < radius) {
+        massI.y = this.height - radius;
+        massI.vy /= 2;
+      }
+
+      if (y > this.height - radius) {
+        massI.y = radius;
+        massI.vy /= 2;
       }
     }
 
