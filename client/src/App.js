@@ -9,9 +9,18 @@ class App extends Component {
     this.spotifyClient = new SpotifyClient();
     this.spotifyClient.setAccessToken(urlParams.access_token);
 
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+
+    this.canvas = null;
+    this.setCanvas = element => {
+      this.canvas = element;
+    };
+
     this.state = {
       loggedIn: urlParams.access_token ? true : false,
       nowPlaying: {
+        fetchingGenres: false,
         name: "Not Checked",
         image: ""
       }
@@ -24,12 +33,18 @@ class App extends Component {
     this.setState({ nowPlaying });
   }
 
-  async handleInspectThing() {
-    const savedTracks = await this.spotifyClient.getSavedTracksAsync();
-    const savedArtists = await this.spotifyClient.getArtistsFromTracksAsync(savedTracks);
-    console.log(savedArtists);
-    const uniqueGenreData = this.spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
-    console.log(uniqueGenreData);
+  async handleFetchGenres() {
+    this.setState({ fetchingGenres: true });
+    try {
+      const savedTracks = await this.spotifyClient.getSavedTracksAsync();
+      const savedArtists = await this.spotifyClient.getArtistsFromTracksAsync(savedTracks);
+      const uniqueGenreData = this.spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
+      console.log(uniqueGenreData);
+    } catch (ex) {
+      console.log(ex);
+    } finally {
+      this.setState({ fetchingGenres: false });
+    }
   }
 
   //test
@@ -47,7 +62,13 @@ class App extends Component {
 
         <button onClick={() => this.handleGetNowPlaying()}>Check Now Playing</button>
 
-        <button onClick={() => this.handleInspectThing()}>Inspect Something</button>
+        <button disabled={this.state.fetchingGenres} onClick={() => this.handleFetchGenres()}>
+          Fetch Genres
+        </button>
+
+        <div>
+          <canvas style={{ backgroundColor: "navy" }} ref={this.setCanvas} width={this.width} height={this.height} />
+        </div>
       </div>
     );
   }
