@@ -1,5 +1,5 @@
 //How masses store themselves visually
-class Manifestation {
+export default class Manifestation {
   constructor(ctx, trailLength, radius) {
     this.ctx = ctx;
 

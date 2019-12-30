@@ -2,12 +2,13 @@
  * Gravitational n-body algorithm
  */
 
-class nBodyProblem {
+export default class nBodyProblem {
   constructor(params) {
+    console.log("Params", params);
+    console.log(this);
     this.g = params.g;
     this.dt = params.dt;
     this.softeningConstant = params.softeningConstant;
-
     this.masses = params.masses;
   }
 
