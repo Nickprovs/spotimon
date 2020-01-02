@@ -5,54 +5,11 @@ import nBodyProblem from "./lib/simulation/nBodyProblem";
 import Manifestation from "./lib/simulation/manifestation";
 
 const scale = 70;
-const radius = 7;
+const radius = 0.5;
 const trailLength = 35;
 const g = 39.5;
-const dt = 0.005; //0.005 years is equal to 1.825 days
+const dt = 0.001; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
-
-const masses = [
-  {
-    name: "Mercury",
-    m: 1.65956463e-7,
-    x: -0.346390408691506,
-    y: -0.272465544507684,
-    z: 0.00951633403684172,
-    vx: 4.25144321778261,
-    vy: -7.61778341043381,
-    vz: -1.01249478093275
-  },
-  {
-    name: "Venus",
-    m: 2.44699613e-6,
-    x: -0.168003526072526,
-    y: 0.698844725464528,
-    z: 0.0192761582256879,
-    vx: -7.2077847105093,
-    vy: -1.76778886124455,
-    vz: 0.391700036358566
-  },
-  {
-    name: "Earth",
-    m: 3.0024584e-6,
-    x: 0.648778995445634,
-    y: 0.747796691108466,
-    z: -3.22953591923124e-5,
-    vx: -4.85085525059392,
-    vy: 4.09601538682312,
-    vz: -0.000258553333317722
-  },
-  {
-    m: 3.213e-7,
-    name: "Mars",
-    x: -0.574871406752105,
-    y: -1.395455041953879,
-    z: -0.01515164037265145,
-    vx: 4.9225288800471425,
-    vy: -1.5065904473191791,
-    vz: -0.1524041758922603
-  }
-];
 
 class App extends Component {
   constructor() {
@@ -66,7 +23,7 @@ class App extends Component {
     this.innerSolarSystem = new nBodyProblem({
       g: g,
       dt: dt,
-      masses: JSON.parse(JSON.stringify(masses)),
+      masses: [],
       softeningConstant: softeningConstant
     });
 
@@ -90,11 +47,6 @@ class App extends Component {
 
   componentDidMount() {
     this.ctx = this.canvas.getContext("2d");
-  }
-
-  beginAnimating() {
-    this.populateManifestations(this.innerSolarSystem.masses);
-    this.animate();
   }
 
   async handleGetNowPlaying() {
@@ -146,25 +98,23 @@ class App extends Component {
 
     for (let genre of genres) {
       const randData = this.getRandomPositionData();
-      this.innerSolarSystem.masses.push({
+      const mass = {
         name: genre.name,
-        m: 3.0024584e-6 * Math.pow(genre.count, 3),
+        m: 3.0024584e-6 * Math.pow(genre.count, 3.33),
         x: randData.x,
         y: randData.y,
         z: randData.z,
         vx: randData.vx,
         vy: randData.vy,
-        vz: randData.vz
-      });
+        vz: randData.vz,
+        manifestation: new Manifestation(this.ctx, trailLength, radius*genre.count)
+      };
+      this.innerSolarSystem.masses.push(mass);
     }
 
     console.log(this.innerSolarSystem.masses);
 
-    this.beginAnimating();
-  }
-
-  populateManifestations(masses) {
-    masses.forEach(mass => (mass["manifestation"] = new Manifestation(this.ctx, trailLength, radius)));
+    this.animate();
   }
 
   animate() {
