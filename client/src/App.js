@@ -137,7 +137,7 @@ class App extends Component {
     let uniqueGenreData = [];
     this.setState({ fetchingGenres: true });
     try {
-      const savedTracks = await this.spotifyClient.getSavedTracksAsync(2);
+      const savedTracks = await this.spotifyClient.getSavedTracksAsync(300);
       const savedArtists = await this.spotifyClient.getArtistsFromTracksAsync(savedTracks);
       uniqueGenreData = this.spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
       console.log(uniqueGenreData);
@@ -192,25 +192,38 @@ class App extends Component {
         this.ctx.fill();
       }
 
-      if (x < radius) {
-        massI.x = this.width - radius;
+      //Past Negative X Dir
+      if (massI.x < -this.width/2 /scale ) {
+        massI.x = this.width/2 /scale;
+        massI.y *= -1;
         massI.vx /= 2;
-      }
+        continue;
+     }
 
-      if (x > this.width - radius) {
-        massI.x = radius;
+      //Past Positive X Dir
+      if (massI.x > this.width/2 /scale ) {
+        massI.x = -this.width/2 /scale;
+        massI.y *= -1;
         massI.vx /= 2;
+        continue;
       }
 
-      if (y < radius) {
-        massI.y = this.height - radius;
+      //Past Negative Y Dir
+      if (massI.y < -this.height/2 /scale ) {
+        massI.y = this.height/2 /scale;
+        massI.x *= -1;
         massI.vy /= 2;
+        continue;
       }
 
-      if (y > this.height - radius) {
-        massI.y = radius;
+      //Past Negative Y Dir
+      if (massI.y > this.height/2 /scale ) {
+        massI.y = -this.height/2 /scale;
+        massI.x *= -1;
         massI.vy /= 2;
+        continue;
       }
+
     }
 
     requestAnimationFrame(this.animate);
