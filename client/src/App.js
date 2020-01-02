@@ -13,16 +13,6 @@ const softeningConstant = 0.15;
 
 const masses = [
   {
-    name: "Sun", //We use solar masses as the unit of mass, so the mass of the Sun is exactly 1
-    m: 1,
-    x: -1.50324727873647e-6,
-    y: -3.93762725944737e-6,
-    z: -4.86567877183925e-8,
-    vx: 3.1669325898331e-5,
-    vy: -6.85489559263319e-6,
-    vz: -7.90076642683254e-7
-  },
-  {
     name: "Mercury",
     m: 1.65956463e-7,
     x: -0.346390408691506,
@@ -147,11 +137,18 @@ class App extends Component {
       this.setState({ fetchingGenres: false });
     }
 
-    for (let genre of uniqueGenreData) {
+    const genresToUseCount = Math.min(100,uniqueGenreData.length);
+    const quarterSize = (genresToUseCount.length / 4)
+    const threeQuarterMark = 3 * (quarterSize -1);
+    const frequentedGenres = uniqueGenreData.slice(0, threeQuarterMark);
+    const unfrequentedGenres = uniqueGenreData.slice(threeQuarterMark, genresToUseCount - 1);
+    const genres = frequentedGenres.concat(unfrequentedGenres);
+
+    for (let genre of genres) {
       const randData = this.getRandomPositionData();
       this.innerSolarSystem.masses.push({
         name: genre.name,
-        m: 3.0024584e-6 * genre.count,
+        m: 3.0024584e-6 * Math.pow(genre.count, 3),
         x: randData.x,
         y: randData.y,
         z: randData.z,
