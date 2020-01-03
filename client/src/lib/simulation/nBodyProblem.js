@@ -1,11 +1,10 @@
 /*
  * Gravitational n-body algorithm
  */
+import CelestialBody from "./celestialBody";
 
 export default class nBodyProblem {
   constructor(params) {
-    console.log("Params", params);
-    console.log(this);
     this.g = params.g;
     this.dt = params.dt;
     this.softeningConstant = params.softeningConstant;
@@ -21,6 +20,7 @@ export default class nBodyProblem {
       massI.x += massI.vx * this.dt;
       massI.y += massI.vy * this.dt;
       massI.z += massI.vz * this.dt;
+
     }
 
     return this;
@@ -32,9 +32,12 @@ export default class nBodyProblem {
     for (let i = 0; i < massesLen; i++) {
       const massI = this.masses[i];
 
+      
+
       massI.vx += massI.ax * this.dt;
       massI.vy += massI.ay * this.dt;
       massI.vz += massI.az * this.dt;
+
     }
   }
 
@@ -49,9 +52,9 @@ export default class nBodyProblem {
       const massI = this.masses[i];
 
       for (let j = 0; j < massesLen; j++) {
+
         if (i !== j) {
           const massJ = this.masses[j];
-
           const dx = massJ.x - massI.x;
           const dy = massJ.y - massI.y;
           const dz = massJ.z - massI.z;
@@ -69,6 +72,7 @@ export default class nBodyProblem {
       massI.ax = ax;
       massI.ay = ay;
       massI.az = az;
+
     }
 
     return this;

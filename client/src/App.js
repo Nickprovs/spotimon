@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 import SpotifyClient from "./lib/spotify/spotifyClient";
 import nBodyProblem from "./lib/simulation/nBodyProblem";
+import CelestialBody from "./lib/simulation/celestialBody";
 import CelestialBodyManifestation from "./lib/simulation/celestialBodyManifestation";
 
 const scale = 70;
@@ -57,22 +58,35 @@ class App extends Component {
   getRandomPositionData() {
     const isNegativeX = Math.random() > 0.5;
     const isNegativeY = Math.random() > 0.5;
+    
     const isNegativeVx = Math.random() > 0.5;
     const isNegativeVy = Math.random() > 0.5;
+
+    const isNegativeAx = Math.random() > 0.5;
+    const isNegativeAy = Math.random() > 0.5;
 
     let x = Math.random() * 2;
     let y = Math.random() * 2;
     const z = 0;
+
     let vx = Math.random() * 4;
     let vy = Math.random() * 4;
     const vz = 0;
 
+    let ax = Math.random() * 1;
+    let ay = Math.random() * 1;
+    const az = 0;
+
     if (isNegativeVx) vx *= -1;
     if (isNegativeVy) vy *= -1;
+
     if (isNegativeX) x *= -1;
     if (isNegativeY) y *= -1;
+    
+    if (isNegativeAx) ax *= -1;
+    if (isNegativeAy) ay *= -1;
 
-    return { x, y, z, vx, vy, vz };
+    return { x, y, z, vx, vy, vz, ax, ay, az };
   }
 
   async handleFetchGenres() {
@@ -96,9 +110,16 @@ class App extends Component {
     const unfrequentedGenres = uniqueGenreData.slice(threeQuarterMark, genresToUseCount - 1);
     const genres = frequentedGenres.concat(unfrequentedGenres);
 
+
+
     for (let genre of genres) {
       const randData = this.getRandomPositionData();
-      const mass = {
+      
+      const manifestationArgs = {
+        ctx: this.ctx, trailLength: trailLength, radius: radius*genre.count
+      };
+
+      const celestialBodyArgs = {
         name: genre.name,
         m: 3.0024584e-6 * Math.pow(genre.count, 3.33),
         x: randData.x,
@@ -106,14 +127,30 @@ class App extends Component {
         z: randData.z,
         vx: randData.vx,
         vy: randData.vy,
-        vz: randData.vz,
-        manifestation: new CelestialBodyManifestation(this.ctx, trailLength, radius*genre.count)
-      };
+        vz: randData.vz,   
+        ax: randData.ax,
+        ay: randData.ay,
+        az: randData.az
+       };
+       
+      let mass = new CelestialBody(celestialBodyArgs, manifestationArgs);
+
+
+
+      // const mass = {
+      //   name: genre.name,
+      //   m: 3.0024584e-6 * Math.pow(genre.count, 3.33),
+      //   x: randData.x,
+      //   y: randData.y,
+      //   z: randData.z,
+      //   vx: randData.vx,
+      //   vy: randData.vy,
+      //   vz: randData.vz,
+      //   manifestation: new CelestialBodyManifestation(this.ctx, trailLength, radius*genre.count)
+      // };
+
       this.innerSolarSystem.masses.push(mass);
     }
-
-    console.log(this.innerSolarSystem.masses);
-
     this.animate();
   }
 
