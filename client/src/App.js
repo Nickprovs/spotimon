@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 import SpotifyClient from "./lib/spotify/spotifyClient";
 import nBodyProblem from "./lib/simulation/nBodyProblem";
-import Manifestation from "./lib/simulation/manifestation";
+import CelestialBodyManifestation from "./lib/simulation/celestialBodyManifestation";
 
 const scale = 70;
 const radius = 0.5;
@@ -107,7 +107,7 @@ class App extends Component {
         vx: randData.vx,
         vy: randData.vy,
         vz: randData.vz,
-        manifestation: new Manifestation(this.ctx, trailLength, radius*genre.count)
+        manifestation: new CelestialBodyManifestation(this.ctx, trailLength, radius*genre.count)
       };
       this.innerSolarSystem.masses.push(mass);
     }

@@ -1,5 +1,5 @@
 //How masses store themselves visually
-export default class Manifestation {
+export default class CelestialBodyManifestation {
   constructor(ctx, trailLength, radius) {
     this.ctx = ctx;
 
