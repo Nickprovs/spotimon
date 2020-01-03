@@ -223,6 +223,7 @@ class App extends Component {
     const massesLen = this.innerSolarSystem.masses.length;
     for (let i = 0; i < massesLen; i++) {
       const massI = this.innerSolarSystem.masses[i];
+      //nested loop through bodies positions (including tail)
       const x = this.width / 2 + massI.x * scale;
       const y = this.height / 2 + massI.y * scale;
 
