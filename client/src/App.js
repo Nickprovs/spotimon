@@ -233,7 +233,7 @@ class App extends Component {
         </button>
 
         <div>
-          <canvas style={{ backgroundColor: "green" }} ref={this.setCanvas} width={this.width} height={this.height} />
+          <canvas style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.width} height={this.height} />
         </div>
       </div>
     );

@@ -4,7 +4,11 @@ export default class CelestialBodyManifestation {
     this.ctx = ctx;
     this.trailLength = trailLength;
     this.radius = radius;
-
+    this.primaryColor = {
+      r: Math.floor(Math.random()*256),      // Random between 0-255
+      g: Math.floor(Math.random()*256),          // Random between 0-255
+      b: Math.floor(Math.random()*256)          // Random between 0-255
+    }
     this.positions = [];
   }
 
@@ -36,9 +40,10 @@ export default class CelestialBodyManifestation {
         circleScaleFactor = scaleFactor;
       }
 
+      const {r,g,b} = this.primaryColor;
       this.ctx.beginPath();
       this.ctx.arc(this.positions[i].x, this.positions[i].y, circleScaleFactor * this.radius, 0, 2 * Math.PI);
-      this.ctx.fillStyle = `rgb(0, 12, 153, ${transparency})`;
+      this.ctx.fillStyle = `rgb(${r}, ${g}, ${b}, ${transparency})`;
 
       this.ctx.fill();
     }
