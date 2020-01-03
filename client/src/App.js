@@ -12,15 +12,21 @@ const g = 39.5;
 const dt = 0.001; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
 
+
 class App extends Component {
+  state = {
+    canvasClickable: false
+  };
+
   constructor() {
     super();
     const urlParams = SpotifyClient.getUrlHashParams();
     this.spotifyClient = new SpotifyClient();
     this.spotifyClient.setAccessToken(urlParams.access_token);
+    this.canvasMousePosition = {x: -1, y: -1};
 
     this.animate = this.animate.bind(this);
-
+    
     this.innerSolarSystem = new nBodyProblem({
       g: g,
       dt: dt,
@@ -134,21 +140,6 @@ class App extends Component {
        };
        
       let mass = new CelestialBody(celestialBodyArgs, manifestationArgs);
-
-
-
-      // const mass = {
-      //   name: genre.name,
-      //   m: 3.0024584e-6 * Math.pow(genre.count, 3.33),
-      //   x: randData.x,
-      //   y: randData.y,
-      //   z: randData.z,
-      //   vx: randData.vx,
-      //   vy: randData.vy,
-      //   vz: randData.vz,
-      //   manifestation: new CelestialBodyManifestation(this.ctx, trailLength, radius*genre.count)
-      // };
-
       this.innerSolarSystem.masses.push(mass);
     }
     this.animate();
@@ -163,12 +154,19 @@ class App extends Component {
 
     const massesLen = this.innerSolarSystem.masses.length;
 
+    let cursorMadeContactWithBody = false;
+
     for (let i = 0; i < massesLen; i++) {
       const massI = this.innerSolarSystem.masses[i];
       const x = this.width / 2 + massI.x * scale;
       const y = this.height / 2 + massI.y * scale;
 
       massI.manifestation.draw(x, y);
+
+      const bodyMouseHitRadius = Math.max(massI.manifestation.radius,7);
+      if(this.pointInCircle(this.canvasMousePosition.x, this.canvasMousePosition.y, x, y, bodyMouseHitRadius)){
+        cursorMadeContactWithBody = true;
+      }
 
       if (massI.name) {
         this.ctx.font = "14px Arial";
@@ -209,12 +207,45 @@ class App extends Component {
       }
 
     }
-
+    this.setState({canvasClickable: cursorMadeContactWithBody});
     requestAnimationFrame(this.animate);
   }
 
+  pointInCircle(x, y, cx, cy, radius) {
+    var distancesquared = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+    return distancesquared <= radius * radius;
+  }
+
+  handleCanvasClick(e){
+    const mouseX = e.nativeEvent.offsetX;
+    const mouseY = e.nativeEvent.offsetY;
+
+    const massesLen = this.innerSolarSystem.masses.length;
+    for (let i = 0; i < massesLen; i++) {
+      const massI = this.innerSolarSystem.masses[i];
+      const x = this.width / 2 + massI.x * scale;
+      const y = this.height / 2 + massI.y * scale;
+
+      const bodyMouseHitRadius = Math.max(massI.manifestation.radius,7);
+
+      if(this.pointInCircle(mouseX, mouseY, x, y, bodyMouseHitRadius)){
+        console.log("clicked", massI.name);
+        return;
+      }
+      
+    }
+  }
+
+  handleMouseMove(e){
+    const {offsetX: x, offsetY: y} = e.nativeEvent;
+    this.canvasMousePosition.x = x;
+    this.canvasMousePosition.y = y;
+  }
+
+
   //test
   render() {
+    const {canvasClickable} = this.state;
     return (
       <div className="App">
         <a href="http://localhost:8888">
@@ -232,8 +263,8 @@ class App extends Component {
           Fetch Genres
         </button>
 
-        <div>
-          <canvas style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.width} height={this.height} />
+        <div style={{cursor: canvasClickable ? "pointer" : "default"}}>
+          <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={(e)=> this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.width} height={this.height} />
         </div>
       </div>
     );
