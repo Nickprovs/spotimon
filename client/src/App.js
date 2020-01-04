@@ -163,10 +163,16 @@ class App extends Component {
 
       massI.manifestation.draw(x, y);
 
-      const bodyMouseHitRadius = Math.max(massI.manifestation.radius,7);
-      if(this.pointInCircle(this.canvasMousePosition.x, this.canvasMousePosition.y, x, y, bodyMouseHitRadius)){
-        cursorMadeContactWithBody = true;
+      for(let j = 0; j < massI.manifestation.positions.length; j++){
+        const scaleFactor = j / massI.manifestation.positions.length;
+        const massPosition = massI.manifestation.positions[j];
+        if(this.pointInCircle(this.canvasMousePosition.x, this.canvasMousePosition.y, massPosition.x, massPosition.y, scaleFactor * massI.manifestation.radius)){
+          cursorMadeContactWithBody = true;
+          break;
+        }
       }
+
+
 
       if (massI.name) {
         this.ctx.font = "14px Arial";
@@ -216,25 +222,57 @@ class App extends Component {
     return distancesquared <= radius * radius;
   }
 
-  handleCanvasClick(e){
+  async handleCanvasClick(e){
     const mouseX = e.nativeEvent.offsetX;
     const mouseY = e.nativeEvent.offsetY;
 
     const massesLen = this.innerSolarSystem.masses.length;
+    let hitDectectionSuccessful = false;
+    let hitDetectedMass = null;
+
     for (let i = 0; i < massesLen; i++) {
       const massI = this.innerSolarSystem.masses[i];
-      //nested loop through bodies positions (including tail)
-      const x = this.width / 2 + massI.x * scale;
-      const y = this.height / 2 + massI.y * scale;
 
-      const bodyMouseHitRadius = Math.max(massI.manifestation.radius,7);
-
-      if(this.pointInCircle(mouseX, mouseY, x, y, bodyMouseHitRadius)){
-        console.log("clicked", massI.name);
-        return;
+      for(let i = 0; i < massI.manifestation.positions.length; i++){
+        const massPosition = massI.manifestation.positions[i];
+        const scaleFactor = i / massI.manifestation.positions.length;
+        
+        if(this.pointInCircle(mouseX, mouseY, massPosition.x, massPosition.y, massI.manifestation.radius * scaleFactor)){
+          console.log("clicked", massI.name);
+          hitDectectionSuccessful = true;
+          hitDetectedMass = massI;
+          break;
+        }
       }
       
+      if(hitDectectionSuccessful)
+      break;
     }
+
+    if(!hitDectectionSuccessful)
+      return;
+
+    const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${hitDetectedMass.name}`)
+    const uri = playlists.playlists.items[0].uri;//.external_urls.spotify;
+    
+    console.log(playlists);
+    console.log(uri);
+
+    //Future Approach:
+    //First... straight up just try and play/shuffle
+
+    //Otherwise...
+    //If that doesn't work... get the available devices.
+    //If there's no devices... open the web player.
+    //If there is a device, get the first one that isn't something weird like a speaker.
+    //Then... transfer playback to that device
+    //And then play/shuffle
+    const devices = await this.spotifyClient.spotifyWebApi.getMyDevices();
+    const deviceId = devices.devices[0].id;
+    await this.spotifyClient.spotifyWebApi.transferMyPlayback([deviceId], {play: true})
+    await this.spotifyClient.play(uri);
+    await this.spotifyClient.shuffle();
+    console.log(devices);
   }
 
   handleMouseMove(e){
@@ -265,7 +303,7 @@ class App extends Component {
         </button>
 
         <div style={{cursor: canvasClickable ? "pointer" : "default"}}>
-          <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={(e)=> this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.width} height={this.height} />
+          <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={async (e) => await this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.width} height={this.height} />
         </div>
       </div>
     );

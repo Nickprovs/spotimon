@@ -1,8 +1,10 @@
 import Spotify from "spotify-web-api-js";
-const spotifyWebApi = new Spotify();
-
-//Wraps JPerez SpotifyWebApi and exposes domain-specific functionality we need
+//Wraps JPerez this.spotifyWebApi and exposes domain-specific functionality we need
 class SpotifyClient {
+constructor(){
+  this.spotifyWebApi = new Spotify();
+}
+
   static getUrlHashParams() {
     var hashParams = {};
     var e,
@@ -15,11 +17,11 @@ class SpotifyClient {
   }
 
   setAccessToken(token) {
-    spotifyWebApi.setAccessToken(token);
+    this.spotifyWebApi.setAccessToken(token);
   }
 
   isLoggedIn() {
-    return spotifyWebApi.getAccessToken() === true;
+    return this.spotifyWebApi.getAccessToken() === true;
   }
 
   async getSavedTracksAsync(totalPullCount = 300) {
@@ -27,11 +29,11 @@ class SpotifyClient {
     try {
       let limit = Math.min(50, totalPullCount);
 
-      const res = await spotifyWebApi.getMySavedTracks();
+      const res = await this.spotifyWebApi.getMySavedTracks();
       const totalSavedCount = res.total;
 
       for (let i = 0; i * limit < totalPullCount && i * limit < totalSavedCount; i++) {
-        const res = await spotifyWebApi.getMySavedTracks({ offset: i * limit, limit: limit });
+        const res = await this.spotifyWebApi.getMySavedTracks({ offset: i * limit, limit: limit });
         likedTracks.push(...res.items.map(o => o.track));
       }
     } catch (ex) {
@@ -45,7 +47,7 @@ class SpotifyClient {
 
     try {
       for (let track of tracks) {
-        const res = await spotifyWebApi.getArtist(track.artists[0].id);
+        const res = await this.spotifyWebApi.getArtist(track.artists[0].id);
         artists.push(res);
       }
     } catch (ex) {
@@ -78,7 +80,7 @@ class SpotifyClient {
 
   async getNowPlayingAsync() {
     try {
-      const res = await spotifyWebApi.getMyCurrentPlaybackState();
+      const res = await this.spotifyWebApi.getMyCurrentPlaybackState();
       return {
         name: res.item.name,
         image: res.item.album.images[0].url
@@ -86,6 +88,21 @@ class SpotifyClient {
     } catch (ex) {
       console.log(ex);
     }
+  }
+
+  async searchPlaylists(searchText){
+    const res = await this.spotifyWebApi.searchPlaylists(searchText);
+    return res;
+  }
+
+  async play(uri){
+    const res = await this.spotifyWebApi.play({context_uri: uri});
+    return res;
+  }
+
+  async shuffle(){
+    const res = await this.spotifyWebApi.setShuffle(true);
+    return res;
   }
 }
 
