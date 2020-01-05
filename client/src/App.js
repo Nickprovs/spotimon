@@ -3,7 +3,7 @@ import "./App.css";
 import SpotifyClient from "./lib/spotify/spotifyClient";
 import nBodyProblem from "./lib/simulation/nBodyProblem";
 import CelestialBody from "./lib/simulation/celestialBody";
-import CelestialBodyManifestation from "./lib/simulation/celestialBodyManifestation";
+import SpotifyPlayer from "react-spotify-web-playback";
 
 const scale = 70;
 const radius = 0.5;
@@ -15,7 +15,11 @@ const softeningConstant = 0.15;
 
 class App extends Component {
   state = {
-    canvasClickable: false
+    canvasClickable: false,
+    currentUris: [],
+    accessToken: "",
+    playing: false,
+    playlistStartOffset: 0
   };
 
   constructor() {
@@ -54,6 +58,8 @@ class App extends Component {
 
   componentDidMount() {
     this.ctx = this.canvas.getContext("2d");
+    const urlParams = SpotifyClient.getUrlHashParams();
+    this.setState({accessToken: urlParams.access_token});
   }
 
   async handleGetNowPlaying() {
@@ -102,7 +108,6 @@ class App extends Component {
       const savedTracks = await this.spotifyClient.getSavedTracksAsync(300);
       const savedArtists = await this.spotifyClient.getArtistsFromTracksAsync(savedTracks);
       uniqueGenreData = this.spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
-      console.log(uniqueGenreData);
     } catch (ex) {
       console.log(ex);
     } finally {
@@ -253,26 +258,12 @@ class App extends Component {
       return;
 
     const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${hitDetectedMass.name}`)
-    const uri = playlists.playlists.items[0].uri;//.external_urls.spotify;
-    
-    console.log(playlists);
-    console.log(uri);
+    const playlist = playlists.playlists.items[0];
+    const playlistOffset = Math.floor(Math.random() * playlist.tracks.total -1)
 
-    //Future Approach:
-    //First... straight up just try and play/shuffle
-
-    //Otherwise...
-    //If that doesn't work... get the available devices.
-    //If there's no devices... open the web player.
-    //If there is a device, get the first one that isn't something weird like a speaker.
-    //Then... transfer playback to that device
-    //And then play/shuffle
-    const devices = await this.spotifyClient.spotifyWebApi.getMyDevices();
-    const deviceId = devices.devices[0].id;
-    await this.spotifyClient.spotifyWebApi.transferMyPlayback([deviceId], {play: true})
-    await this.spotifyClient.play(uri);
-    await this.spotifyClient.shuffle();
-    console.log(devices);
+    this.setState({playlistStartOffset: playlistOffset})
+    this.setState({currentUris: [playlist.uri]});
+    this.setState({playing: true});
   }
 
   handleMouseMove(e){
@@ -281,10 +272,16 @@ class App extends Component {
     this.canvasMousePosition.y = y;
   }
 
+  async handlePlayerStatusChange(state){
+    console.log(state);
+    this.setState({playing: state.isPlaying});
+    if(state.isPlaying)
+      await this.spotifyClient.shuffle();
+  }
 
   //test
   render() {
-    const {canvasClickable} = this.state;
+    const {playlistStartOffset, accessToken, canvasClickable, currentUris, playing} = this.state;
     return (
       <div className="App">
         <a href="http://localhost:8888">
@@ -304,6 +301,10 @@ class App extends Component {
 
         <div style={{cursor: canvasClickable ? "pointer" : "default"}}>
           <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={async (e) => await this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.width} height={this.height} />
+        </div>
+
+        <div>
+          <SpotifyPlayer offset={playlistStartOffset} callback={async (state) => this.handlePlayerStatusChange(state)}play={playing} uris={currentUris} token = {accessToken}/>
         </div>
       </div>
     );
