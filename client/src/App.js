@@ -304,7 +304,7 @@ class App extends Component {
         </div>
 
         <div>
-          <SpotifyPlayer offset={playlistStartOffset} callback={async (state) => this.handlePlayerStatusChange(state)}play={playing} uris={currentUris} token = {accessToken}/>
+          <SpotifyPlayer showSaveIcon={true} offset={playlistStartOffset} callback={async (state) => this.handlePlayerStatusChange(state)}play={playing} uris={currentUris} token = {accessToken}/>
         </div>
       </div>
     );
