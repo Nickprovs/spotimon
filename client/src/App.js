@@ -15,6 +15,8 @@ const softeningConstant = 0.15;
 
 class App extends Component {
   state = {
+    canvasWidth: 0,
+    canvasHeight: 0,
     canvasClickable: false,
     currentUris: [],
     accessToken: "",
@@ -38,9 +40,6 @@ class App extends Component {
       softeningConstant: softeningConstant
     });
 
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-
     this.canvas = null;
     this.setCanvas = element => {
       this.canvas = element;
@@ -55,12 +54,21 @@ class App extends Component {
       }
     };
   }
+  handleWindowResize(){
+    this.setState({canvasWidth: window.innerWidth * 0.9});
+    this.setState({canvasHeight: window.innerHeight * 0.8});
+  }
 
   componentDidMount() {
     this.ctx = this.canvas.getContext("2d");
     const urlParams = SpotifyClient.getUrlHashParams();
     this.setState({accessToken: urlParams.access_token});
+    this.state.canvasWidth = window.innerWidth * 0.9;
+    this.state.canvasHeight = window.innerHeight * 0.8;
+    window.addEventListener('resize', this.handleWindowResize.bind(this));
   }
+
+
 
   async handleGetNowPlaying() {
     const nowPlaying = await this.spotifyClient.getNowPlayingAsync();
@@ -155,7 +163,7 @@ class App extends Component {
     this.innerSolarSystem.updateAccelerationVectors();
     this.innerSolarSystem.updateVelocityVectors();
 
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
 
     const massesLen = this.innerSolarSystem.masses.length;
 
@@ -163,8 +171,8 @@ class App extends Component {
 
     for (let i = 0; i < massesLen; i++) {
       const massI = this.innerSolarSystem.masses[i];
-      const x = this.width / 2 + massI.x * scale;
-      const y = this.height / 2 + massI.y * scale;
+      const x = this.state.canvasWidth / 2 + massI.x * scale;
+      const y = this.state.canvasHeight / 2 + massI.y * scale;
 
       massI.manifestation.draw(x, y);
 
@@ -186,32 +194,32 @@ class App extends Component {
       }
 
       //Past Negative X Dir
-      if (massI.x < -this.width/2 /scale ) {
-        massI.x = this.width/2 /scale;
+      if (massI.x < -this.state.canvasWidth/2 /scale ) {
+        massI.x = this.state.canvasWidth/2 /scale;
         massI.y *= -1;
         massI.vx /= 2;
         continue;
      }
 
       //Past Positive X Dir
-      if (massI.x > this.width/2 /scale ) {
-        massI.x = -this.width/2 /scale;
+      if (massI.x > this.state.canvasWidth/2 /scale ) {
+        massI.x = -this.state.canvasWidth/2 /scale;
         massI.y *= -1;
         massI.vx /= 2;
         continue;
       }
 
       //Past Negative Y Dir
-      if (massI.y < -this.height/2 /scale ) {
-        massI.y = this.height/2 /scale;
+      if (massI.y < -this.state.canvasHeight/2 /scale ) {
+        massI.y = this.state.canvasHeight/2 /scale;
         massI.x *= -1;
         massI.vy /= 2;
         continue;
       }
 
       //Past Negative Y Dir
-      if (massI.y > this.height/2 /scale ) {
-        massI.y = -this.height/2 /scale;
+      if (massI.y > this.state.canvasHeight/2 /scale ) {
+        massI.y = -this.state.canvasHeight/2 /scale;
         massI.x *= -1;
         massI.vy /= 2;
         continue;
@@ -300,7 +308,7 @@ class App extends Component {
         </button>
 
         <div style={{cursor: canvasClickable ? "pointer" : "default"}}>
-          <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={async (e) => await this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.width} height={this.height} />
+          <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={async (e) => await this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.state.canvasWidth} height={this.state.canvasHeight} />
         </div>
 
         <div>
