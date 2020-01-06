@@ -45,6 +45,16 @@ class App extends Component {
       this.canvas = element;
     };
 
+    this.header = null;
+    this.setHeader = element => {
+      this.header = element;
+    };
+
+    this.footer = null;
+    this.setFooter = element => {
+      this.footer = element;
+    };
+
     this.state = {
       loggedIn: urlParams.access_token ? true : false,
       nowPlaying: {
@@ -56,7 +66,7 @@ class App extends Component {
   }
   handleWindowResize(){
     this.setState({canvasWidth: window.innerWidth * 0.9});
-    this.setState({canvasHeight: window.innerHeight * 0.8});
+    this.setState({canvasHeight: window.innerHeight*0.99 - this.getAbsoluteHeight(this.header)  - this.getAbsoluteHeight(this.footer)});
   }
 
   componentDidMount() {
@@ -64,8 +74,20 @@ class App extends Component {
     const urlParams = SpotifyClient.getUrlHashParams();
     this.setState({accessToken: urlParams.access_token});
     this.state.canvasWidth = window.innerWidth * 0.9;
-    this.state.canvasHeight = window.innerHeight * 0.8;
+    this.state.canvasHeight = window.innerHeight*0.99 - this.getAbsoluteHeight(this.header)  - this.getAbsoluteHeight(this.footer);
     window.addEventListener('resize', this.handleWindowResize.bind(this));
+
+    console.log("header", this.header);
+    console.log("footer", this.footer);
+
+  }
+
+  getAbsoluteHeight(el) {
+    var styles = window.getComputedStyle(el);
+    var margin = parseFloat(styles['marginTop']) +
+                 parseFloat(styles['marginBottom']);
+  
+    return Math.ceil(el.offsetHeight + margin);
   }
 
 
@@ -292,28 +314,33 @@ class App extends Component {
     const {playlistStartOffset, accessToken, canvasClickable, currentUris, playing} = this.state;
     return (
       <div className="App">
-        <a href="http://localhost:8888">
-          <button>Login With Spotify</button>
-        </a>
 
-        <div>Now Playing: {this.state.nowPlaying.name}</div>
-        <div>
-          <img style={{ width: 100 }} src={this.state.nowPlaying.image} />
+        <div ref={this.setHeader}>
+          <a href="http://localhost:8888">
+            <button>Login With Spotify</button>
+          </a>
+
+          <div>Now Playing: {this.state.nowPlaying.name}</div>
+          <div>
+            <img style={{ width: 100 }} src={this.state.nowPlaying.image} />
+          </div>
+
+          <button onClick={() => this.handleGetNowPlaying()}>Check Now Playing</button>
+
+          <button disabled={this.state.fetchingGenres} onClick={() => this.handleFetchGenres()}>
+            Fetch Genres
+          </button>
         </div>
 
-        <button onClick={() => this.handleGetNowPlaying()}>Check Now Playing</button>
-
-        <button disabled={this.state.fetchingGenres} onClick={() => this.handleFetchGenres()}>
-          Fetch Genres
-        </button>
 
         <div style={{cursor: canvasClickable ? "pointer" : "default"}}>
-          <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={async (e) => await this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.state.canvasWidth} height={this.state.canvasHeight} />
+            <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={async (e) => await this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.state.canvasWidth} height={this.state.canvasHeight} />
         </div>
 
-        <div>
+        <div ref={this.setFooter}>
           <SpotifyPlayer showSaveIcon={true} offset={playlistStartOffset} callback={async (state) => this.handlePlayerStatusChange(state)}play={playing} uris={currentUris} token = {accessToken}/>
         </div>
+
       </div>
     );
   }
