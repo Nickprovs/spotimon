@@ -12,7 +12,6 @@ const g = 39.5;
 const dt = 0.001; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
 
-
 class App extends Component {
   state = {
     canvasWidth: 0,
@@ -29,10 +28,10 @@ class App extends Component {
     const urlParams = SpotifyClient.getUrlHashParams();
     this.spotifyClient = new SpotifyClient();
     this.spotifyClient.setAccessToken(urlParams.access_token);
-    this.canvasMousePosition = {x: -1, y: -1};
+    this.canvasMousePosition = { x: -1, y: -1 };
 
     this.animate = this.animate.bind(this);
-    
+
     this.innerSolarSystem = new nBodyProblem({
       g: g,
       dt: dt,
@@ -64,33 +63,33 @@ class App extends Component {
       }
     };
   }
-  handleWindowResize(){
-    this.setState({canvasWidth: window.innerWidth * 0.9});
-    this.setState({canvasHeight: window.innerHeight*0.99 - this.getAbsoluteHeight(this.header)  - this.getAbsoluteHeight(this.footer)});
+  handleWindowResize() {
+    this.setState({ canvasWidth: window.innerWidth });
+    this.setState({
+      canvasHeight:
+        window.innerHeight * 0.99 - this.getAbsoluteHeight(this.header) - this.getAbsoluteHeight(this.footer)
+    });
   }
 
   componentDidMount() {
     this.ctx = this.canvas.getContext("2d");
     const urlParams = SpotifyClient.getUrlHashParams();
-    this.setState({accessToken: urlParams.access_token});
-    this.state.canvasWidth = window.innerWidth * 0.9;
-    this.state.canvasHeight = window.innerHeight*0.99 - this.getAbsoluteHeight(this.header)  - this.getAbsoluteHeight(this.footer);
-    window.addEventListener('resize', this.handleWindowResize.bind(this));
+    this.setState({ accessToken: urlParams.access_token });
+    this.state.canvasWidth = window.innerWidth;
+    this.state.canvasHeight =
+      window.innerHeight * 0.99 - this.getAbsoluteHeight(this.header) - this.getAbsoluteHeight(this.footer);
+    window.addEventListener("resize", this.handleWindowResize.bind(this));
 
     console.log("header", this.header);
     console.log("footer", this.footer);
-
   }
 
   getAbsoluteHeight(el) {
     var styles = window.getComputedStyle(el);
-    var margin = parseFloat(styles['marginTop']) +
-                 parseFloat(styles['marginBottom']);
-  
+    var margin = parseFloat(styles["marginTop"]) + parseFloat(styles["marginBottom"]);
+
     return Math.ceil(el.offsetHeight + margin);
   }
-
-
 
   async handleGetNowPlaying() {
     const nowPlaying = await this.spotifyClient.getNowPlayingAsync();
@@ -100,7 +99,7 @@ class App extends Component {
   getRandomPositionData() {
     const isNegativeX = Math.random() > 0.5;
     const isNegativeY = Math.random() > 0.5;
-    
+
     const isNegativeVx = Math.random() > 0.5;
     const isNegativeVy = Math.random() > 0.5;
 
@@ -124,7 +123,7 @@ class App extends Component {
 
     if (isNegativeX) x *= -1;
     if (isNegativeY) y *= -1;
-    
+
     if (isNegativeAx) ax *= -1;
     if (isNegativeAy) ay *= -1;
 
@@ -144,20 +143,20 @@ class App extends Component {
       this.setState({ fetchingGenres: false });
     }
 
-    const genresToUseCount = Math.min(100,uniqueGenreData.length);
-    const quarterSize = (genresToUseCount.length / 4)
-    const threeQuarterMark = 3 * (quarterSize -1);
+    const genresToUseCount = Math.min(100, uniqueGenreData.length);
+    const quarterSize = genresToUseCount.length / 4;
+    const threeQuarterMark = 3 * (quarterSize - 1);
     const frequentedGenres = uniqueGenreData.slice(0, threeQuarterMark);
     const unfrequentedGenres = uniqueGenreData.slice(threeQuarterMark, genresToUseCount - 1);
     const genres = frequentedGenres.concat(unfrequentedGenres);
 
-
-
     for (let genre of genres) {
       const randData = this.getRandomPositionData();
-      
+
       const manifestationArgs = {
-        ctx: this.ctx, trailLength: trailLength, radius: radius*genre.count
+        ctx: this.ctx,
+        trailLength: trailLength,
+        radius: radius * genre.count
       };
 
       const celestialBodyArgs = {
@@ -168,12 +167,12 @@ class App extends Component {
         z: randData.z,
         vx: randData.vx,
         vy: randData.vy,
-        vz: randData.vz,   
+        vz: randData.vz,
         ax: randData.ax,
         ay: randData.ay,
         az: randData.az
-       };
-       
+      };
+
       let mass = new CelestialBody(celestialBodyArgs, manifestationArgs);
       this.innerSolarSystem.masses.push(mass);
     }
@@ -198,16 +197,22 @@ class App extends Component {
 
       massI.manifestation.draw(x, y);
 
-      for(let j = 0; j < massI.manifestation.positions.length; j++){
+      for (let j = 0; j < massI.manifestation.positions.length; j++) {
         const scaleFactor = j / massI.manifestation.positions.length;
         const massPosition = massI.manifestation.positions[j];
-        if(this.pointInCircle(this.canvasMousePosition.x, this.canvasMousePosition.y, massPosition.x, massPosition.y, scaleFactor * massI.manifestation.radius)){
+        if (
+          this.pointInCircle(
+            this.canvasMousePosition.x,
+            this.canvasMousePosition.y,
+            massPosition.x,
+            massPosition.y,
+            scaleFactor * massI.manifestation.radius
+          )
+        ) {
           cursorMadeContactWithBody = true;
           break;
         }
       }
-
-
 
       if (massI.name) {
         this.ctx.font = "14px Arial";
@@ -216,39 +221,38 @@ class App extends Component {
       }
 
       //Past Negative X Dir
-      if (massI.x < -this.state.canvasWidth/2 /scale ) {
-        massI.x = this.state.canvasWidth/2 /scale;
+      if (massI.x < -this.state.canvasWidth / 2 / scale) {
+        massI.x = this.state.canvasWidth / 2 / scale;
         massI.y *= -1;
         massI.vx /= 2;
         continue;
-     }
+      }
 
       //Past Positive X Dir
-      if (massI.x > this.state.canvasWidth/2 /scale ) {
-        massI.x = -this.state.canvasWidth/2 /scale;
+      if (massI.x > this.state.canvasWidth / 2 / scale) {
+        massI.x = -this.state.canvasWidth / 2 / scale;
         massI.y *= -1;
         massI.vx /= 2;
         continue;
       }
 
       //Past Negative Y Dir
-      if (massI.y < -this.state.canvasHeight/2 /scale ) {
-        massI.y = this.state.canvasHeight/2 /scale;
+      if (massI.y < -this.state.canvasHeight / 2 / scale) {
+        massI.y = this.state.canvasHeight / 2 / scale;
         massI.x *= -1;
         massI.vy /= 2;
         continue;
       }
 
       //Past Negative Y Dir
-      if (massI.y > this.state.canvasHeight/2 /scale ) {
-        massI.y = -this.state.canvasHeight/2 /scale;
+      if (massI.y > this.state.canvasHeight / 2 / scale) {
+        massI.y = -this.state.canvasHeight / 2 / scale;
         massI.x *= -1;
         massI.vy /= 2;
         continue;
       }
-
     }
-    this.setState({canvasClickable: cursorMadeContactWithBody});
+    this.setState({ canvasClickable: cursorMadeContactWithBody });
     requestAnimationFrame(this.animate);
   }
 
@@ -257,7 +261,7 @@ class App extends Component {
     return distancesquared <= radius * radius;
   }
 
-  async handleCanvasClick(e){
+  async handleCanvasClick(e) {
     const mouseX = e.nativeEvent.offsetX;
     const mouseY = e.nativeEvent.offsetY;
 
@@ -268,53 +272,51 @@ class App extends Component {
     for (let i = 0; i < massesLen; i++) {
       const massI = this.innerSolarSystem.masses[i];
 
-      for(let i = 0; i < massI.manifestation.positions.length; i++){
+      for (let i = 0; i < massI.manifestation.positions.length; i++) {
         const massPosition = massI.manifestation.positions[i];
         const scaleFactor = i / massI.manifestation.positions.length;
-        
-        if(this.pointInCircle(mouseX, mouseY, massPosition.x, massPosition.y, massI.manifestation.radius * scaleFactor)){
+
+        if (
+          this.pointInCircle(mouseX, mouseY, massPosition.x, massPosition.y, massI.manifestation.radius * scaleFactor)
+        ) {
           console.log("clicked", massI.name);
           hitDectectionSuccessful = true;
           hitDetectedMass = massI;
           break;
         }
       }
-      
-      if(hitDectectionSuccessful)
-      break;
+
+      if (hitDectectionSuccessful) break;
     }
 
-    if(!hitDectectionSuccessful)
-      return;
+    if (!hitDectectionSuccessful) return;
 
-    const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${hitDetectedMass.name}`)
+    const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${hitDetectedMass.name}`);
     const playlist = playlists.playlists.items[0];
-    const playlistOffset = Math.floor(Math.random() * playlist.tracks.total -1)
+    const playlistOffset = Math.floor(Math.random() * playlist.tracks.total - 1);
 
-    this.setState({playlistStartOffset: playlistOffset})
-    this.setState({currentUris: [playlist.uri]});
-    this.setState({playing: true});
+    this.setState({ playlistStartOffset: playlistOffset });
+    this.setState({ currentUris: [playlist.uri] });
+    this.setState({ playing: true });
   }
 
-  handleMouseMove(e){
-    const {offsetX: x, offsetY: y} = e.nativeEvent;
+  handleMouseMove(e) {
+    const { offsetX: x, offsetY: y } = e.nativeEvent;
     this.canvasMousePosition.x = x;
     this.canvasMousePosition.y = y;
   }
 
-  async handlePlayerStatusChange(state){
+  async handlePlayerStatusChange(state) {
     console.log(state);
-    this.setState({playing: state.isPlaying});
-    if(state.isPlaying)
-      await this.spotifyClient.shuffle();
+    this.setState({ playing: state.isPlaying });
+    if (state.isPlaying) await this.spotifyClient.shuffle();
   }
 
   //test
   render() {
-    const {playlistStartOffset, accessToken, canvasClickable, currentUris, playing} = this.state;
+    const { playlistStartOffset, accessToken, canvasClickable, currentUris, playing } = this.state;
     return (
       <div className="App">
-
         <div ref={this.setHeader}>
           <a href="http://localhost:8888">
             <button>Login With Spotify</button>
@@ -332,15 +334,27 @@ class App extends Component {
           </button>
         </div>
 
-
-        <div style={{cursor: canvasClickable ? "pointer" : "default"}}>
-            <canvas onMouseMove={(e) => this.handleMouseMove(e)} onClick={async (e) => await this.handleCanvasClick(e)} style={{ backgroundColor: "#0c1d40" }} ref={this.setCanvas} width={this.state.canvasWidth} height={this.state.canvasHeight} />
+        <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
+          <canvas
+            onMouseMove={e => this.handleMouseMove(e)}
+            onClick={async e => await this.handleCanvasClick(e)}
+            style={{ backgroundColor: "#0c1d40" }}
+            ref={this.setCanvas}
+            width={this.state.canvasWidth}
+            height={this.state.canvasHeight}
+          />
         </div>
 
         <div ref={this.setFooter}>
-          <SpotifyPlayer showSaveIcon={true} offset={playlistStartOffset} callback={async (state) => this.handlePlayerStatusChange(state)}play={playing} uris={currentUris} token = {accessToken}/>
+          <SpotifyPlayer
+            showSaveIcon={true}
+            offset={playlistStartOffset}
+            callback={async state => this.handlePlayerStatusChange(state)}
+            play={playing}
+            uris={currentUris}
+            token={accessToken}
+          />
         </div>
-
       </div>
     );
   }
