@@ -64,6 +64,7 @@ class App extends Component {
     };
   }
   handleWindowResize() {
+    //TODO: No matter the case, we shouldn't be displaying scroll bars. Use a css class to prevent that.
     this.setState({ canvasWidth: window.innerWidth });
     this.setState({
       canvasHeight:
