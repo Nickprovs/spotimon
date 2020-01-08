@@ -71,6 +71,7 @@ class App extends Component {
 
   componentDidMount() {
     const urlParams = SpotifyClient.getUrlHashParams();
+    this.setState({ accessToken: urlParams.access_token });
     this.setSimulatorSize();
     window.addEventListener("resize", this.handleWindowResize.bind(this));
 
@@ -180,10 +181,10 @@ class App extends Component {
     console.log(this.state.simulationDriver);
     this.setState({ simulatorEnabled: true });
 
-    setTimeout(() => {
-      console.log("cancelling anim");
-      this.setState({ simulatorEnabled: false });
-    }, 5000);
+    // setTimeout(() => {
+    //   console.log("cancelling anim");
+    //   this.setState({ simulatorEnabled: false });
+    // }, 5000);
   }
 
   async handleGenreClick(hitDetectedGravitationalObject) {
@@ -227,6 +228,8 @@ class App extends Component {
       currentUris,
       playing
     } = this.state;
+
+    console.log("access token", accessToken);
     return (
       <div className="App">
         <div ref={this.setHeader}>
@@ -247,14 +250,6 @@ class App extends Component {
         </div>
 
         <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
-          {/* <canvas
-            onMouseMove={e => this.handleMouseMove(e)}
-            onClick={async e => await this.handleCanvasClick(e)}
-            style={{ backgroundColor: "#0c1d40" }}
-            ref={this.setCanvas}
-            width={this.state.canvasWidth}
-            height={this.state.canvasHeight}
-          /> */}
           <SpaceSimulator
             simulationDriver={simulationDriver}
             isEnabled={simulatorEnabled}
