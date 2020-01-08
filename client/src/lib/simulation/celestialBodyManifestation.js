@@ -1,15 +1,15 @@
 //How masses store themselves visually
 export default class CelestialBodyManifestation {
-  constructor(ctx, trailLength, radius) {
-    this.ctx = ctx;
+  constructor(trailLength, radius) {
     this.trailLength = trailLength;
     this.radius = radius;
     this.primaryColor = {
-      r: Math.floor(Math.random()*256),      // Random between 0-255
-      g: Math.floor(Math.random()*256),          // Random between 0-255
-      b: Math.floor(Math.random()*256)          // Random between 0-255
-    }
+      r: Math.floor(Math.random() * 256), // Random between 0-255
+      g: Math.floor(Math.random() * 256), // Random between 0-255
+      b: Math.floor(Math.random() * 256) // Random between 0-255
+    };
     this.positions = [];
+    this.storePosition = this.storePosition.bind(this);
   }
 
   storePosition(x, y) {
@@ -17,11 +17,10 @@ export default class CelestialBodyManifestation {
       x,
       y
     });
-
     if (this.positions.length > this.trailLength) this.positions.shift();
   }
 
-  draw(x, y) {
+  draw(canvasContext, x, y) {
     this.storePosition(x, y);
 
     const positionsLen = this.positions.length;
@@ -40,12 +39,12 @@ export default class CelestialBodyManifestation {
         circleScaleFactor = scaleFactor;
       }
 
-      const {r,g,b} = this.primaryColor;
-      this.ctx.beginPath();
-      this.ctx.arc(this.positions[i].x, this.positions[i].y, circleScaleFactor * this.radius, 0, 2 * Math.PI);
-      this.ctx.fillStyle = `rgb(${r}, ${g}, ${b}, ${transparency})`;
+      const { r, g, b } = this.primaryColor;
+      canvasContext.beginPath();
+      canvasContext.arc(this.positions[i].x, this.positions[i].y, circleScaleFactor * this.radius, 0, 2 * Math.PI);
+      canvasContext.fillStyle = `rgb(${r}, ${g}, ${b}, ${transparency})`;
 
-      this.ctx.fill();
+      canvasContext.fill();
     }
   }
 }

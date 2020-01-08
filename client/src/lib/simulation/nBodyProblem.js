@@ -9,6 +9,7 @@ export default class nBodyProblem {
     this.dt = params.dt;
     this.softeningConstant = params.softeningConstant;
     this.masses = params.masses;
+    this.scale = params.scale;
   }
 
   updatePositionVectors() {
@@ -20,7 +21,6 @@ export default class nBodyProblem {
       massI.x += massI.vx * this.dt;
       massI.y += massI.vy * this.dt;
       massI.z += massI.vz * this.dt;
-
     }
 
     return this;
@@ -32,12 +32,9 @@ export default class nBodyProblem {
     for (let i = 0; i < massesLen; i++) {
       const massI = this.masses[i];
 
-      
-
       massI.vx += massI.ax * this.dt;
       massI.vy += massI.ay * this.dt;
       massI.vz += massI.az * this.dt;
-
     }
   }
 
@@ -52,7 +49,6 @@ export default class nBodyProblem {
       const massI = this.masses[i];
 
       for (let j = 0; j < massesLen; j++) {
-
         if (i !== j) {
           const massJ = this.masses[j];
           const dx = massJ.x - massI.x;
@@ -72,7 +68,6 @@ export default class nBodyProblem {
       massI.ax = ax;
       massI.ay = ay;
       massI.az = az;
-
     }
 
     return this;
