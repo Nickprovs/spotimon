@@ -2,14 +2,13 @@ import React, { Component } from "react";
 import MathUtilities from "../lib/util/mathExtensions";
 
 class SpaceSimulator extends Component {
-  state = {
-    isAnimating: false
-  };
+  state = {};
 
   constructor() {
     super();
 
-    //Assuring that this is properly set for the animate function
+    this.animationId = null;
+    this.isAnimating = false;
     this.animate = this.animate.bind(this);
 
     //Reference for working directly with the canvas element
@@ -119,7 +118,7 @@ class SpaceSimulator extends Component {
       this.currentMouseOverObject = null;
     }
 
-    requestAnimationFrame(this.animate);
+    this.animationId = requestAnimationFrame(this.animate);
   }
 
   //Sets current canvas mouse position as a global variable
@@ -174,16 +173,23 @@ class SpaceSimulator extends Component {
   }
 
   setAnimation(shouldAnimate) {
-    if (shouldAnimate) {
-      let test = requestAnimationFrame(this.animate);
-      console.log("animating", test);
+    console.log("setting anim status", shouldAnimate);
+    if (shouldAnimate && !this.isAnimating) {
+      this.animationId = requestAnimationFrame(this.animate);
+      console.log("got animation id", this.animationId);
+      this.isAnimating = true;
+    }
+
+    if (!shouldAnimate && this.isAnimating) {
+      cancelAnimationFrame(this.animationId);
+      this.isAnimating = false;
+      this.animationId = null;
     }
   }
 
   render() {
-    const { isEnabled, width, height, canvasClickable, backgroundColor } = this.props;
-    const { isAnimating } = this.state;
-    if (!isAnimating && isEnabled) this.setAnimation(true);
+    const { isEnabled, width, height, canvasClickable, backgroundColor, cursor } = this.props;
+    this.setAnimation(isEnabled);
 
     console.log("render width", width);
     console.log("background color", backgroundColor);
@@ -193,7 +199,7 @@ class SpaceSimulator extends Component {
           ref={this.setCanvas}
           onMouseMove={e => this.handleCanvasMouseMove(e)}
           onClick={async e => await this.handleCanvasMouseClick(e)}
-          style={{ backgroundColor: backgroundColor }}
+          style={{ backgroundColor: backgroundColor, cursor: cursor }}
           width={width}
           height={height}
         />

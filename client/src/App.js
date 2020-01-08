@@ -18,7 +18,7 @@ class App extends Component {
     simulatorEnabled: false,
     simulationWidth: 0,
     simulationHeight: 0,
-    simulationClickable: false,
+    simulationCursor: "default",
     currentUris: [],
     accessToken: "",
     playing: false,
@@ -193,11 +193,13 @@ class App extends Component {
   }
 
   handleGenreMouseEnter(hitDetectedGravitationalObject) {
+    this.setState({ simulationCursor: "pointer" });
     console.log("Mouse over", hitDetectedGravitationalObject);
   }
 
   handleGenreMouseLeave(hitDetectedGravitationalObject) {
     console.log("Mouse left", hitDetectedGravitationalObject);
+    this.setState({ simulationCursor: "default" });
   }
 
   async handlePlayerStatusChange(state) {
@@ -209,6 +211,7 @@ class App extends Component {
   //test
   render() {
     const {
+      simulationCursor,
       simulationDriver,
       simulatorEnabled,
       simulatorWidth,
@@ -248,11 +251,12 @@ class App extends Component {
             height={this.state.canvasHeight}
           /> */}
           <SpaceSimulator
-            isEnabled={simulatorEnabled}
             simulationDriver={simulationDriver}
+            isEnabled={simulatorEnabled}
             backgroundColor={"#0c1d40"}
             width={simulatorWidth}
             height={simulatorHeight}
+            cursor={simulationCursor}
             onGravitationalObjectClick={async item => this.handleGenreClick(item)}
             onGravitationalObjectMouseEnter={item => this.handleGenreMouseEnter(item)}
             onGravitationalObjectMouseLeave={item => this.handleGenreMouseLeave(item)}
