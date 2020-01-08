@@ -179,6 +179,11 @@ class App extends Component {
     }
     console.log(this.state.simulationDriver);
     this.setState({ simulatorEnabled: true });
+
+    setTimeout(() => {
+      console.log("cancelling anim");
+      this.setState({ simulatorEnabled: false });
+    }, 5000);
   }
 
   async handleGenreClick(hitDetectedGravitationalObject) {

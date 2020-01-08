@@ -27,13 +27,7 @@ class SpaceSimulator extends Component {
   }
 
   animate() {
-    const {
-      simulationDriver,
-      width,
-      height,
-      onGravitationalObjectMouseEnter,
-      onGravitationalObjectMouseLeave
-    } = this.props;
+    const { simulationDriver, width, height } = this.props;
 
     simulationDriver.updatePositionVectors();
     simulationDriver.updateAccelerationVectors();
@@ -42,32 +36,12 @@ class SpaceSimulator extends Component {
     this.canvasContext.clearRect(0, 0, width, height);
 
     const massesLen = simulationDriver.masses.length;
-
-    let gravitationalObjectUnderCursor = null;
-
     for (let i = 0; i < massesLen; i++) {
       const massI = simulationDriver.masses[i];
       const x = width / 2 + massI.x * simulationDriver.scale;
       const y = height / 2 + massI.y * simulationDriver.scale;
 
       massI.manifestation.draw(this.canvasContext, x, y);
-
-      for (let j = 0; j < massI.manifestation.positions.length; j++) {
-        const scaleFactor = j / massI.manifestation.positions.length;
-        const massPosition = massI.manifestation.positions[j];
-        if (
-          MathUtilities.isPointWithinCircle(
-            this.canvasMousePosition.x,
-            this.canvasMousePosition.y,
-            massPosition.x,
-            massPosition.y,
-            scaleFactor * massI.manifestation.radius
-          )
-        ) {
-          gravitationalObjectUnderCursor = massI;
-          break;
-        }
-      }
 
       if (massI.name) {
         this.canvasContext.font = "14px Arial";
@@ -108,16 +82,6 @@ class SpaceSimulator extends Component {
       }
     }
 
-    if (gravitationalObjectUnderCursor && this.currentMouseOverObject !== gravitationalObjectUnderCursor) {
-      this.currentMouseOverObject = gravitationalObjectUnderCursor;
-      onGravitationalObjectMouseEnter(gravitationalObjectUnderCursor);
-    }
-
-    if (!gravitationalObjectUnderCursor && this.currentMouseOverObject) {
-      onGravitationalObjectMouseLeave(this.currentMouseOverObject);
-      this.currentMouseOverObject = null;
-    }
-
     this.animationId = requestAnimationFrame(this.animate);
   }
 
@@ -127,8 +91,42 @@ class SpaceSimulator extends Component {
     const { offsetX: x, offsetY: y } = e.nativeEvent;
     this.canvasMousePosition.x = x;
     this.canvasMousePosition.y = y;
-  }
 
+    const { simulationDriver, onGravitationalObjectMouseEnter, onGravitationalObjectMouseLeave } = this.props;
+
+    let gravitationalObjectUnderCursor = null;
+    const massesLen = simulationDriver.masses.length;
+
+    for (let i = 0; i < massesLen; i++) {
+      const massI = simulationDriver.masses[i];
+      for (let j = 0; j < massI.manifestation.positions.length; j++) {
+        const scaleFactor = j / massI.manifestation.positions.length;
+        const massPosition = massI.manifestation.positions[j];
+        if (
+          MathUtilities.isPointWithinCircle(
+            this.canvasMousePosition.x,
+            this.canvasMousePosition.y,
+            massPosition.x,
+            massPosition.y,
+            scaleFactor * massI.manifestation.radius
+          )
+        ) {
+          gravitationalObjectUnderCursor = massI;
+          break;
+        }
+        if (gravitationalObjectUnderCursor) break;
+      }
+    }
+    if (gravitationalObjectUnderCursor && this.currentMouseOverObject !== gravitationalObjectUnderCursor) {
+      this.currentMouseOverObject = gravitationalObjectUnderCursor;
+      onGravitationalObjectMouseEnter(gravitationalObjectUnderCursor);
+    }
+
+    if (!gravitationalObjectUnderCursor && this.currentMouseOverObject) {
+      onGravitationalObjectMouseLeave(this.currentMouseOverObject);
+      this.currentMouseOverObject = null;
+    }
+  }
   //Detects if a hit has occured on the canvas
   //Calls onGravitationalObjectClicked if there's a hit (passed in via props)
   handleCanvasMouseClick(e) {
