@@ -166,18 +166,19 @@ class SpaceSimulator extends Component {
   }
 
   render() {
-    const { isEnabled, width, height, canvasClickable } = this.props;
+    const { isEnabled, width, height, canvasClickable, backgroundColor } = this.props;
     const { isAnimating } = this.state;
     if (!isAnimating && isEnabled) this.setAnimation(true);
 
     console.log("render width", width);
+    console.log("background color", backgroundColor);
     return (
       <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
         <canvas
           ref={this.setCanvas}
           onMouseMove={e => this.handleCanvasMouseMove(e)}
           onClick={async e => await this.handleCanvasMouseClick(e)}
-          style={{ backgroundColor: "green" }}
+          style={{ backgroundColor: backgroundColor }}
           width={width}
           height={height}
         />

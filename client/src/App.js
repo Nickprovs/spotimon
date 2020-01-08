@@ -246,6 +246,7 @@ class App extends Component {
           <SpaceSimulator
             isEnabled={simulatorEnabled}
             simulationDriver={simulationDriver}
+            backgroundColor={"#0c1d40"}
             width={simulatorWidth}
             height={simulatorHeight}
             onGravitationalObjectClick={async item => this.handleGenreClick(item)}
