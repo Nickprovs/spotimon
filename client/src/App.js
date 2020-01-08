@@ -192,8 +192,12 @@ class App extends Component {
     this.setState({ playing: true });
   }
 
-  handleGenreMouseOver(hitDetectedGravitationalObject) {
+  handleGenreMouseEnter(hitDetectedGravitationalObject) {
     console.log("Mouse over", hitDetectedGravitationalObject);
+  }
+
+  handleGenreMouseLeave(hitDetectedGravitationalObject) {
+    console.log("Mouse left", hitDetectedGravitationalObject);
   }
 
   async handlePlayerStatusChange(state) {
@@ -250,7 +254,8 @@ class App extends Component {
             width={simulatorWidth}
             height={simulatorHeight}
             onGravitationalObjectClick={async item => this.handleGenreClick(item)}
-            onGravitationalObjectMouseOver={item => this.handleGenreMouseOver(item)}
+            onGravitationalObjectMouseEnter={item => this.handleGenreMouseEnter(item)}
+            onGravitationalObjectMouseLeave={item => this.handleGenreMouseLeave(item)}
           />
         </div>
 

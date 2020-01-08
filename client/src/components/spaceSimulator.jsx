@@ -14,6 +14,7 @@ class SpaceSimulator extends Component {
 
     //Reference for working directly with the canvas element
     this.canvasMousePosition = { x: -1, y: -1 };
+    this.currentMouseOverObject = null;
     this.canvas = null;
     this.setCanvas = element => {
       this.canvas = element;
@@ -27,7 +28,13 @@ class SpaceSimulator extends Component {
   }
 
   animate() {
-    const { simulationDriver, width, height, onGravitationalObjectMouseOver } = this.props;
+    const {
+      simulationDriver,
+      width,
+      height,
+      onGravitationalObjectMouseEnter,
+      onGravitationalObjectMouseLeave
+    } = this.props;
 
     simulationDriver.updatePositionVectors();
     simulationDriver.updateAccelerationVectors();
@@ -102,7 +109,15 @@ class SpaceSimulator extends Component {
       }
     }
 
-    if (gravitationalObjectUnderCursor) onGravitationalObjectMouseOver(gravitationalObjectUnderCursor);
+    if (gravitationalObjectUnderCursor && this.currentMouseOverObject !== gravitationalObjectUnderCursor) {
+      this.currentMouseOverObject = gravitationalObjectUnderCursor;
+      onGravitationalObjectMouseEnter(gravitationalObjectUnderCursor);
+    }
+
+    if (!gravitationalObjectUnderCursor && this.currentMouseOverObject) {
+      onGravitationalObjectMouseLeave(this.currentMouseOverObject);
+      this.currentMouseOverObject = null;
+    }
 
     requestAnimationFrame(this.animate);
   }
