@@ -9,7 +9,7 @@ import ElementUtilities from "./lib/util/elementUtilities";
 import "./App.css";
 
 const radius = 0.5;
-const trailLength = 35;
+const trailLength = 8;
 const g = 39.5;
 const dt = 0.001; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
@@ -107,7 +107,7 @@ class App extends Component {
       this.setState({ fetchingGenres: false });
     }
 
-    const genresToUseCount = Math.min(100, uniqueGenreData.length);
+    const genresToUseCount = Math.min(50, uniqueGenreData.length);
     const quarterSize = genresToUseCount.length / 4;
     const threeQuarterMark = 3 * (quarterSize - 1);
     const frequentedGenres = uniqueGenreData.slice(0, threeQuarterMark);
@@ -145,11 +145,9 @@ class App extends Component {
 
   handleGenreMouseEnter(hitDetectedGravitationalObject) {
     this.setState({ simulationCursor: "pointer" });
-    console.log("Mouse over", hitDetectedGravitationalObject);
   }
 
   handleGenreMouseLeave(hitDetectedGravitationalObject) {
-    console.log("Mouse left", hitDetectedGravitationalObject);
     this.setState({ simulationCursor: "default" });
   }
 
@@ -174,7 +172,6 @@ class App extends Component {
       playing
     } = this.state;
 
-    console.log("access token", accessToken);
     return (
       <div className="App">
         <div ref={this.setHeader}>

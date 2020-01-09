@@ -7,11 +7,12 @@ class SpaceSimulator extends Component {
   constructor() {
     super();
 
+    //Animation
     this.animationId = null;
     this.isAnimating = false;
     this.animate = this.animate.bind(this);
 
-    //Reference for working directly with the canvas element
+    //Canvas
     this.canvasMousePosition = { x: -1, y: -1 };
     this.currentMouseOverObject = null;
     this.canvas = null;
@@ -21,8 +22,6 @@ class SpaceSimulator extends Component {
   }
 
   componentDidMount() {
-    const { masses } = this.props;
-    console.log("passed masses", masses);
     this.canvasContext = this.canvas.getContext("2d");
   }
 
@@ -35,8 +34,7 @@ class SpaceSimulator extends Component {
 
     this.canvasContext.clearRect(0, 0, width, height);
 
-    const massesLen = simulationDriver.masses.length;
-    for (let i = 0; i < massesLen; i++) {
+    for (let i = 0; i < simulationDriver.masses.length; i++) {
       const massI = simulationDriver.masses[i];
       const x = width / 2 + massI.x * simulationDriver.scale;
       const y = height / 2 + massI.y * simulationDriver.scale;
@@ -49,33 +47,35 @@ class SpaceSimulator extends Component {
         this.canvasContext.fill();
       }
 
+      const edgeX = width / 2 / simulationDriver.scale;
       //Past Negative X Dir
-      if (massI.x < -width / 2 / simulationDriver.scale) {
-        massI.x = width / 2 / simulationDriver.scale;
+      if (massI.x < -edgeX) {
+        massI.x = edgeX;
         massI.y *= -1;
         massI.vx /= 2;
         continue;
       }
 
       //Past Positive X Dir
-      if (massI.x > width / 2 / simulationDriver.scale) {
-        massI.x = -width / 2 / simulationDriver.scale;
+      if (massI.x > edgeX) {
+        massI.x = -edgeX;
         massI.y *= -1;
         massI.vx /= 2;
         continue;
       }
 
+      const edgeY = height / 2 / simulationDriver.scale;
       //Past Negative Y Dir
-      if (massI.y < -height / 2 / simulationDriver.scale) {
-        massI.y = height / 2 / simulationDriver.scale;
+      if (massI.y < -edgeY) {
+        massI.y = edgeY;
         massI.x *= -1;
         massI.vy /= 2;
         continue;
       }
 
       //Past Negative Y Dir
-      if (massI.y > height / 2 / simulationDriver.scale) {
-        massI.y = -height / 2 / simulationDriver.scale;
+      if (massI.y > edgeY) {
+        massI.y = -edgeY;
         massI.x *= -1;
         massI.vy /= 2;
         continue;
