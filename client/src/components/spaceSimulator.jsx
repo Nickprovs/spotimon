@@ -42,9 +42,9 @@ class SpaceSimulator extends Component {
       massI.manifestation.draw(this.canvasContext, x, y);
 
       if (massI.name) {
-        this.canvasContext.font = "14px Arial";
-        this.canvasContext.fillText(massI.name, x + 12, y + 4);
-        this.canvasContext.fill();
+        // this.canvasContext.fillStyle = "white";
+        this.canvasContext.font = "16px Arial";
+        this.canvasContext.fillText(massI.name, x + massI.manifestation.radius + 2, y - massI.manifestation.radius - 2);
       }
 
       const edgeX = width / 2 / simulationDriver.scale;

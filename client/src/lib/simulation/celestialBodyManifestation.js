@@ -43,8 +43,12 @@ export default class CelestialBodyManifestation {
       canvasContext.beginPath();
       canvasContext.arc(this.positions[i].x, this.positions[i].y, circleScaleFactor * this.radius, 0, 2 * Math.PI);
       canvasContext.fillStyle = `rgb(${r}, ${g}, ${b}, ${transparency})`;
-
       canvasContext.fill();
     }
+
+    //Stroke the last (non-trail) circle-- stroking is expensive.
+    canvasContext.strokeStyle = "black";
+    canvasContext.lineWidth = 1;
+    canvasContext.stroke();
   }
 }
