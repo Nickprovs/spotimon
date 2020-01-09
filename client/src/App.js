@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import "./App.css";
 import SpotifyClient from "./lib/spotify/spotifyClient";
 import CelestialBody from "./lib/simulation/celestialBody";
 import SpotifyPlayer from "react-spotify-web-playback";
 import SpaceSimulator from "./components/spaceSimulator";
 import nBodyProblem from "./lib/simulation/nBodyProblem";
+import SimulationUtilities from "./lib/util/simulationUtilities";
+import ElementUtilities from "./lib/util/elementUtilities";
+import "./App.css";
 
 const radius = 0.5;
 const trailLength = 35;
@@ -64,6 +66,17 @@ class App extends Component {
       scale: scale
     });
   }
+
+  setSimulatorSize() {
+    this.setState({ simulatorWidth: window.innerWidth });
+    this.setState({
+      simulatorHeight:
+        window.innerHeight * 0.99 -
+        ElementUtilities.getAbsoluteHeight(this.header) -
+        ElementUtilities.getAbsoluteHeight(this.footer)
+    });
+  }
+
   handleWindowResize() {
     //TODO: No matter the case, we shouldn't be displaying scroll bars. Use a css class to prevent that.
     this.setSimulatorSize();
@@ -74,63 +87,11 @@ class App extends Component {
     this.setState({ accessToken: urlParams.access_token });
     this.setSimulatorSize();
     window.addEventListener("resize", this.handleWindowResize.bind(this));
-
-    console.log("header", this.header);
-    console.log("footer", this.footer);
-  }
-
-  setSimulatorSize() {
-    this.setState({ simulatorWidth: window.innerWidth });
-    this.setState({
-      simulatorHeight:
-        window.innerHeight * 0.99 - this.getAbsoluteHeight(this.header) - this.getAbsoluteHeight(this.footer)
-    });
-  }
-
-  getAbsoluteHeight(el) {
-    var styles = window.getComputedStyle(el);
-    var margin = parseFloat(styles["marginTop"]) + parseFloat(styles["marginBottom"]);
-
-    return Math.ceil(el.offsetHeight + margin);
   }
 
   async handleGetNowPlaying() {
     const nowPlaying = await this.spotifyClient.getNowPlayingAsync();
     if (nowPlaying) this.setState({ nowPlaying });
-  }
-
-  getRandomPositionData() {
-    const isNegativeX = Math.random() > 0.5;
-    const isNegativeY = Math.random() > 0.5;
-
-    const isNegativeVx = Math.random() > 0.5;
-    const isNegativeVy = Math.random() > 0.5;
-
-    const isNegativeAx = Math.random() > 0.5;
-    const isNegativeAy = Math.random() > 0.5;
-
-    let x = Math.random() * 2;
-    let y = Math.random() * 2;
-    const z = 0;
-
-    let vx = Math.random() * 4;
-    let vy = Math.random() * 4;
-    const vz = 0;
-
-    let ax = Math.random() * 1;
-    let ay = Math.random() * 1;
-    const az = 0;
-
-    if (isNegativeVx) vx *= -1;
-    if (isNegativeVy) vy *= -1;
-
-    if (isNegativeX) x *= -1;
-    if (isNegativeY) y *= -1;
-
-    if (isNegativeAx) ax *= -1;
-    if (isNegativeAy) ay *= -1;
-
-    return { x, y, z, vx, vy, vz, ax, ay, az };
   }
 
   async handleFetchGenres() {
@@ -154,8 +115,6 @@ class App extends Component {
     const genres = frequentedGenres.concat(unfrequentedGenres);
 
     for (let genre of genres) {
-      const randData = this.getRandomPositionData();
-
       const manifestationArgs = {
         trailLength: trailLength,
         radius: radius * genre.count
@@ -164,27 +123,13 @@ class App extends Component {
       const celestialBodyArgs = {
         name: genre.name,
         m: 3.0024584e-6 * Math.pow(genre.count, 3.33),
-        x: randData.x,
-        y: randData.y,
-        z: randData.z,
-        vx: randData.vx,
-        vy: randData.vy,
-        vz: randData.vz,
-        ax: randData.ax,
-        ay: randData.ay,
-        az: randData.az
+        ...SimulationUtilities.getRandomGravitationalObjectData()
       };
 
       let mass = new CelestialBody(celestialBodyArgs, manifestationArgs);
       this.state.simulationDriver.masses.push(mass);
     }
-    console.log(this.state.simulationDriver);
     this.setState({ simulatorEnabled: true });
-
-    // setTimeout(() => {
-    //   console.log("cancelling anim");
-    //   this.setState({ simulatorEnabled: false });
-    // }, 5000);
   }
 
   async handleGenreClick(hitDetectedGravitationalObject) {
@@ -211,7 +156,7 @@ class App extends Component {
   async handlePlayerStatusChange(state) {
     console.log(state);
     this.setState({ playing: state.isPlaying });
-    if (state.isPlaying) await this.spotifyClient.shuffle();
+    if (state.isPlaying) await this.spotifyClient.setShuffle(true);
   }
 
   //test

@@ -13,6 +13,6 @@ export default class CelestialBody {
     this.ax = celestialBodyArgs.ax;
     this.ay = celestialBodyArgs.ay;
     this.az = celestialBodyArgs.az;
-    this.manifestation = new CelestialBodyManifestation(manifestationArgs.trailLength, manifestationArgs.radius);
+    this.manifestation = new CelestialBodyManifestation(manifestationArgs);
   }
 }

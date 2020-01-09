@@ -1,8 +1,8 @@
 //How masses store themselves visually
 export default class CelestialBodyManifestation {
-  constructor(trailLength, radius) {
-    this.trailLength = trailLength;
-    this.radius = radius;
+  constructor(manifestationArgs) {
+    this.trailLength = manifestationArgs.trailLength;
+    this.radius = manifestationArgs.radius;
     this.primaryColor = {
       r: Math.floor(Math.random() * 256), // Random between 0-255
       g: Math.floor(Math.random() * 256), // Random between 0-255
