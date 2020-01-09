@@ -42,7 +42,7 @@ class SpaceSimulator extends Component {
       massI.manifestation.draw(this.canvasContext, x, y);
 
       if (massI.name) {
-        // this.canvasContext.fillStyle = "white";
+        this.canvasContext.fillStyle = "white";
         this.canvasContext.font = "16px Arial";
         this.canvasContext.fillText(massI.name, x + massI.manifestation.radius + 2, y - massI.manifestation.radius - 2);
       }
