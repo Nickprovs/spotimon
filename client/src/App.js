@@ -125,6 +125,7 @@ class App extends Component {
     for (let genre of genres) {
       const manifestationArgs = {
         trailLength: trailLength,
+        defaultRadius: radius * genre.count,
         radius: radius * genre.count
       };
 
@@ -203,7 +204,7 @@ class App extends Component {
       s => s.start <= currentTrackData.progressInSeconds && s.start + s.duration > currentTrackData.progressInSeconds
     )[0];
 
-    const averageRecentLength = 4;
+    const averageRecentLength = 6;
 
     let timeCoeffecient = 1;
     if (matchingSegmentForTime && currentTrackData.recentLoudnessData.length >= averageRecentLength) {
@@ -218,10 +219,16 @@ class App extends Component {
 
       let comparisonWithMaxLoudness = Math.pow(Math.abs(maxLoudness / matchingSegmentForTime.loudness_start), 1.7);
 
-      timeCoeffecient = 0.5 * comparisonWithLast + 0.5 * comparisonWithRecentAverage + 0 * comparisonWithMaxLoudness;
+      timeCoeffecient = 0.4 * comparisonWithLast + 0.4 * comparisonWithRecentAverage + 0.2 * comparisonWithMaxLoudness;
     }
     this.state.simulationDriver.dt = 3 * dt * timeCoeffecient;
-
+    for (let i = 0; i < this.state.simulationDriver.masses.length - 1; i++) {
+      const mass = this.state.simulationDriver.masses[i];
+      if (!isNaN(timeCoeffecient))
+        mass.manifestation.radius =
+          mass.manifestation.defaultRadius + mass.manifestation.defaultRadius * timeCoeffecient;
+      // console.log("time coeff", timeCoeffecient,  "default radius", mass.manifestation.defaultRadius);
+    }
     if (matchingSegmentForTime) {
       currentTrackData.recentLoudnessData.push(matchingSegmentForTime.loudness_start);
       if (currentTrackData.recentLoudnessData.count > averageRecentLength) currentTrackData.recentLoudnessData.pop();
