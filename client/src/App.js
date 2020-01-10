@@ -6,6 +6,7 @@ import SpaceSimulator from "./components/spaceSimulator";
 import nBodyProblem from "./lib/simulation/nBodyProblem";
 import SimulationUtilities from "./lib/util/simulationUtilities";
 import ElementUtilities from "./lib/util/elementUtilities";
+
 import "./App.css";
 
 const radius = 0.5;
@@ -24,6 +25,7 @@ class App extends Component {
     currentUris: [],
     accessToken: "",
     playlistStartOffset: 0,
+
     nowPlaying: {
       fetchingGenres: false,
       name: "Not Checked",
@@ -32,7 +34,8 @@ class App extends Component {
     currentTrackData: {
       id: "",
       analysis: null,
-      progressInSeconds: 0
+      progressInSeconds: 0,
+      recentLoudnessData: []
     },
     playRequested: false,
     playing: false
@@ -200,9 +203,29 @@ class App extends Component {
       s => s.start <= currentTrackData.progressInSeconds && s.start + s.duration > currentTrackData.progressInSeconds
     )[0];
 
-    this.state.simulationDriver.dt = matchingSegmentForTime
-      ? 5 * dt * Math.pow(Math.abs(maxLoudness / matchingSegmentForTime.loudness_start), 1.7)
-      : dt;
+    const averageRecentLength = 4;
+
+    let timeCoeffecient = 1;
+    if (matchingSegmentForTime && currentTrackData.recentLoudnessData.length >= averageRecentLength) {
+      let averageRecent =
+        currentTrackData.recentLoudnessData.reduce((a, b) => a + b, 0) / currentTrackData.recentLoudnessData.length;
+      let comparisonWithRecentAverage = Math.abs(matchingSegmentForTime.loudness_start / averageRecent);
+
+      let comparisonWithLast = Math.abs(
+        matchingSegmentForTime.loudness_start /
+          currentTrackData.recentLoudnessData[currentTrackData.recentLoudnessData.length - 1]
+      );
+
+      let comparisonWithMaxLoudness = Math.pow(Math.abs(maxLoudness / matchingSegmentForTime.loudness_start), 1.7);
+
+      timeCoeffecient = 0.5 * comparisonWithLast + 0.5 * comparisonWithRecentAverage + 0 * comparisonWithMaxLoudness;
+    }
+    this.state.simulationDriver.dt = 3 * dt * timeCoeffecient;
+
+    if (matchingSegmentForTime) {
+      currentTrackData.recentLoudnessData.push(matchingSegmentForTime.loudness_start);
+      if (currentTrackData.recentLoudnessData.count > averageRecentLength) currentTrackData.recentLoudnessData.pop();
+    }
   }
 
   async updateNewTrackData(trackId) {
