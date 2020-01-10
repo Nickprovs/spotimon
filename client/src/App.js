@@ -23,8 +23,19 @@ class App extends Component {
     simulationCursor: "default",
     currentUris: [],
     accessToken: "",
-    playing: false,
-    playlistStartOffset: 0
+    playlistStartOffset: 0,
+    nowPlaying: {
+      fetchingGenres: false,
+      name: "Not Checked",
+      image: ""
+    },
+    currentTrackData: {
+      id: "",
+      analysis: null,
+      progressInSeconds: 0
+    },
+    playRequested: false,
+    playing: false
   };
 
   constructor() {
@@ -32,6 +43,9 @@ class App extends Component {
     const urlParams = SpotifyClient.getUrlHashParams();
     this.spotifyClient = new SpotifyClient();
     this.spotifyClient.setAccessToken(urlParams.access_token);
+
+    this.durationCheckTimerId = null;
+    this.onDurationCheck = this.onDurationCheck.bind(this);
 
     this.canvas = null;
     this.setCanvas = element => {
@@ -46,15 +60,6 @@ class App extends Component {
     this.footer = null;
     this.setFooter = element => {
       this.footer = element;
-    };
-
-    this.state = {
-      loggedIn: urlParams.access_token ? true : false,
-      nowPlaying: {
-        fetchingGenres: false,
-        name: "Not Checked",
-        image: ""
-      }
     };
 
     //The N-Body Problem object which embodies our simulator data and calculations
@@ -136,11 +141,18 @@ class App extends Component {
     const genreName = hitDetectedGravitationalObject.name;
     const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${genreName}`);
     const playlist = playlists.playlists.items[0];
-    const playlistOffset = Math.floor(Math.random() * playlist.tracks.total - 1);
+    const playlistOffset = Math.min(
+      Math.floor(Math.random() * 100),
+      Math.floor(Math.random() * playlist.tracks.total - 1)
+    );
+    const res = await await this.spotifyClient.getPlaylistTracks(playlist.id, { offset: playlistOffset });
+    const song = res.items[0].track;
+    console.log("playlist song", song);
+    await this.updateNewTrackData(song.id);
 
     this.setState({ playlistStartOffset: playlistOffset });
     this.setState({ currentUris: [playlist.uri] });
-    this.setState({ playing: true });
+    this.setState({ playRequested: true });
   }
 
   handleGenreMouseEnter(hitDetectedGravitationalObject) {
@@ -152,9 +164,51 @@ class App extends Component {
   }
 
   async handlePlayerStatusChange(state) {
-    console.log(state);
+    const previouslyPlaying = this.state.playing;
     this.setState({ playing: state.isPlaying });
-    if (state.isPlaying) await this.spotifyClient.setShuffle(true);
+    // if (state.track && state.track.id != this.state.currentTrackData.id) {
+    //   await this.updateNewTrackData(state.track);
+    // }
+
+    if (state.isPlaying) {
+      this.setState({ currentTrackData: { ...this.state.currentTrackData, progressInSeconds: state.position } });
+    }
+
+    if (!state.isPlaying) {
+      clearInterval(this.durationCheckTimerId);
+      this.setState({ playRequested: false });
+    }
+    if (state.isPlaying && !previouslyPlaying) {
+      try {
+        // await this.spotifyClient.setShuffle(true);
+      } catch (ex) {
+        console.log("shuffle issue", ex);
+      }
+      this.durationCheckTimerId = setInterval(this.onDurationCheck, 200);
+      console.log(this.state.currentTrackData.analysis);
+    }
+  }
+
+  onDurationCheck() {
+    const currentTrackData = { ...this.state.currentTrackData };
+    currentTrackData.progressInSeconds += 0.2;
+    this.setState({ currentTrackData });
+
+    const maxLoudness = currentTrackData.analysis.track.loudness;
+
+    let matchingSegmentForTime = currentTrackData.analysis.segments.filter(
+      s => s.start <= currentTrackData.progressInSeconds && s.start + s.duration > currentTrackData.progressInSeconds
+    )[0];
+
+    this.state.simulationDriver.dt = matchingSegmentForTime
+      ? 5 * dt * Math.pow(Math.abs(maxLoudness / matchingSegmentForTime.loudness_start), 1.7)
+      : dt;
+  }
+
+  async updateNewTrackData(trackId) {
+    const res = await this.spotifyClient.getAudioAnalysisForTrack(trackId);
+    const currentTrackData = { ...this.state.currentTrackData, id: trackId, analysis: res, progressInSeconds: 0 };
+    this.setState({ currentTrackData });
   }
 
   //test
@@ -169,7 +223,7 @@ class App extends Component {
       accessToken,
       canvasClickable,
       currentUris,
-      playing
+      playRequested
     } = this.state;
 
     return (
@@ -210,7 +264,7 @@ class App extends Component {
             showSaveIcon={true}
             offset={playlistStartOffset}
             callback={async state => this.handlePlayerStatusChange(state)}
-            play={playing}
+            play={playRequested}
             uris={currentUris}
             token={accessToken}
           />

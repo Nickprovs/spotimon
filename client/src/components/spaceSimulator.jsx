@@ -171,10 +171,8 @@ class SpaceSimulator extends Component {
   }
 
   setAnimation(shouldAnimate) {
-    console.log("setting anim status", shouldAnimate);
     if (shouldAnimate && !this.isAnimating) {
       this.animationId = requestAnimationFrame(this.animate);
-      console.log("got animation id", this.animationId);
       this.isAnimating = true;
     }
 
@@ -188,9 +186,6 @@ class SpaceSimulator extends Component {
   render() {
     const { isEnabled, width, height, canvasClickable, backgroundColor, cursor } = this.props;
     this.setAnimation(isEnabled);
-
-    console.log("render width", width);
-    console.log("background color", backgroundColor);
     return (
       <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
         <canvas
