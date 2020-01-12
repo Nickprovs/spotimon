@@ -226,7 +226,7 @@ class App extends Component {
       const mass = this.state.simulationDriver.masses[i];
       if (!isNaN(timeCoeffecient))
         mass.manifestation.radius =
-          mass.manifestation.defaultRadius + mass.manifestation.defaultRadius * timeCoeffecient;
+          mass.manifestation.defaultRadius + 2.5 * mass.manifestation.defaultRadius * timeCoeffecient;
       // console.log("time coeff", timeCoeffecient,  "default radius", mass.manifestation.defaultRadius);
     }
     if (matchingSegmentForTime) {
@@ -259,8 +259,8 @@ class App extends Component {
     return (
       <div className="App">
         <div ref={this.setHeader}>
-          <a href="http://localhost:8888">
-            <button>Login With Spotify</button>
+          <a href="http://localhost:8888/login">
+            <button style={{ backgroundColor: "green" }}>Login With Spotify</button>
           </a>
 
           <div>Now Playing: {this.state.nowPlaying.name}</div>
