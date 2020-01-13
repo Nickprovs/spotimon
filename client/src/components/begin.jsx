@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ElementUtilities from "../lib/util/elementUtilities";
 
 class Begin extends Component {
   state = {
@@ -26,9 +27,9 @@ class Begin extends Component {
   }
 
   sizeContentToWindow() {
-    this.setState({ headerHeight: window.innerHeight * 0.2 });
-    this.setState({ contentHeight: window.innerHeight * 0.6 });
-    this.setState({ footerHeight: window.innerHeight * 0.2 });
+    this.setState({ headerHeight: window.innerHeight * 0.98 * 0.2 });
+    this.setState({ contentHeight: window.innerHeight * 0.98 * 0.6 });
+    this.setState({ footerHeight: window.innerHeight * 0.98 * 0.2 });
   }
 
   render() {
@@ -36,8 +37,10 @@ class Begin extends Component {
     return (
       <div>
         {/* Intro Info */}
-        <div style={{ height: headerHeight, textAlign: "center" }}>
-          <h1>Begin</h1>
+        <div style={{ backgroundColor: "green", height: headerHeight, textAlign: "center" }}>
+          <div style={{ display: "inline-block", verticalAlign: "middle" }}>
+            <h1>Begin</h1>
+          </div>
         </div>
 
         {/* Preview */}
@@ -49,6 +52,7 @@ class Begin extends Component {
             style={{ objectFit: "cover" }}
             filt
             id="preview"
+            muted="true"
             preload="true"
             autoPlay="true"
             loop="loop"
@@ -60,8 +64,17 @@ class Begin extends Component {
         </div>
 
         {/* Begin */}
-        <div style={{ height: footerHeight, textAlign: "center" }}>
-          <button>Hi there</button>
+        <div style={{ backgroundColor: "green", height: footerHeight, textAlign: "center" }}>
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <button>Begin</button>
+          </div>
         </div>
       </div>
     );
