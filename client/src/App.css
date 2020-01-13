@@ -28,6 +28,11 @@
   color: #61dafb;
 }
 
+.preview-video {
+  -webkit-filter: opacity(40%); /* Safari 6.0 - 9.0 */
+  filter: opacity(40%);
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

@@ -45,6 +45,8 @@ export default class Sposmos extends Component {
     this.spotifyClient = new SpotifyClient();
     this.spotifyClient.setAccessToken(urlParams.access_token);
 
+    this.handleWindowResize = this.handleWindowResize.bind(this);
+
     this.durationCheckTimerId = null;
     this.onDurationCheck = this.onDurationCheck.bind(this);
 
@@ -92,7 +94,11 @@ export default class Sposmos extends Component {
     const urlParams = SpotifyClient.getUrlHashParams();
     this.setState({ accessToken: urlParams.access_token });
     this.setSimulatorSize();
-    window.addEventListener("resize", this.handleWindowResize.bind(this));
+    window.addEventListener("resize", this.handleWindowResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.handleWindowResize);
   }
 
   async handleGetNowPlaying() {
