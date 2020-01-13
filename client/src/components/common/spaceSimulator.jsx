@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import MathUtilities from "../lib/util/mathUtilities";
+import MathUtilities from "../../lib/util/mathUtilities";
 
 class SpaceSimulator extends Component {
   state = {};
