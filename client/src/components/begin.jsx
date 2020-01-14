@@ -37,7 +37,7 @@ class Begin extends Component {
     return (
       <div>
         {/* Intro Info */}
-        <div style={{ backgroundColor: "green", height: headerHeight, textAlign: "center" }}>
+        <div style={{ backgroundColor: "#0c1d40", height: headerHeight, textAlign: "center" }}>
           <div style={{ display: "inline-block", verticalAlign: "middle" }}>
             <h1>Begin</h1>
           </div>
@@ -64,7 +64,7 @@ class Begin extends Component {
         </div>
 
         {/* Begin */}
-        <div style={{ backgroundColor: "green", height: footerHeight, textAlign: "center" }}>
+        <div style={{ backgroundColor: "#0c1d40", height: footerHeight, textAlign: "center" }}>
           <div
             style={{
               height: "100%",

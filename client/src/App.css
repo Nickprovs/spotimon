@@ -29,8 +29,8 @@
 }
 
 .preview-video {
-  -webkit-filter: opacity(40%); /* Safari 6.0 - 9.0 */
-  filter: opacity(40%);
+  -webkit-filter: opacity(70%); /* Safari 6.0 - 9.0 */
+  filter: opacity(70%);
 }
 
 @keyframes App-logo-spin {
