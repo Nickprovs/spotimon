@@ -24,6 +24,10 @@
   color: white;
 }
 
+.standard-text {
+  font-family: "Montserrat-ExtraLight";
+}
+
 .App-link {
   color: #61dafb;
 }

@@ -27,9 +27,9 @@ class Begin extends Component {
   }
 
   sizeContentToWindow() {
-    this.setState({ headerHeight: window.innerHeight * 0.98 * 0.2 });
-    this.setState({ contentHeight: window.innerHeight * 0.98 * 0.6 });
-    this.setState({ footerHeight: window.innerHeight * 0.98 * 0.2 });
+    this.setState({ headerHeight: window.innerHeight * 0.98 * 0.1 });
+    this.setState({ contentHeight: window.innerHeight * 0.98 * 0.45 });
+    this.setState({ footerHeight: window.innerHeight * 0.98 * 0.45 });
   }
 
   render() {
@@ -39,7 +39,9 @@ class Begin extends Component {
         {/* Intro Info */}
         <div style={{ backgroundColor: "#0c1d40", height: headerHeight, textAlign: "center" }}>
           <div style={{ display: "inline-block", verticalAlign: "middle" }}>
-            <h1>Begin</h1>
+            <h1 style={{ color: "white", fontSize: "32" }} className="standard-text">
+              The Universe Bumps With You
+            </h1>
           </div>
         </div>
 
