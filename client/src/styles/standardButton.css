@@ -1,12 +1,13 @@
 .standardButton {
-  font-family: "Montserrat-ExtraLight";
-  font-size: 3vmin;
+  font-family: "Montserrat-Medium";
+  font-size: 2.2vmin;
+  letter-spacing: 1px;
   color: var(--f1);
-  background: var(--b1);
+  background: var(--s2);
   border-color: var(--f1);
-  border-radius: 4px;
-  border-width: 0.75px;
-  padding: 5px 7px;
+  border-radius: 25px;
+  border-width: 0px;
+  padding: 10px 15px;
   min-width: 90px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -14,20 +15,19 @@
 
 @media (hover: hover) {
   .standardButton:hover {
-    background-color: var(--b2);
+    background-color: var(--s3);
   }
 }
 .standardButton:disabled,
 .standardButton[disabled] {
   cursor: not-allowed;
   border: solid;
-  border-color: var(--b2);
-  background-color: var(--b3);
+  background-color: var(--s4);
   color: var(f1);
 }
 
 .standardButton:active {
-  background-color: var(--b3);
+  background-color: var(--s4);
 }
 
 .standardButton:focus {

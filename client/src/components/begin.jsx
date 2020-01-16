@@ -33,16 +33,16 @@ class Begin extends Component {
             <li>
               Requirements
               <ul>
-                <li>Spotify Premium Membership</li>
-                <li>Your "Liked Songs" Playlist must have some content.</li>
+                <li>Spotify Premium</li>
+                <li>"Liked Songs" Playlist must have content.</li>
               </ul>
             </li>
             <li>
               What Is This?
               <ul>
-                <li>Explore your taste from most to least frequented genres.</li>
-                <li>Visualize your taste through the mass of your genres and the way they "bump" to the music.</li>
-                <li>Hit "Begin" to authenticate directly with Spotify.</li>
+                <li>Explore your most and least frequented genres.</li>
+                <li>Discover something new in your sposmos.</li>
+                <li>Visualize your tunes.</li>
               </ul>
             </li>
           </ul>
@@ -57,7 +57,7 @@ class Begin extends Component {
               </ul> */}
         <div className="enter-area">
           <div className="enter-button-container">
-            <StandardButton>Begin</StandardButton>
+            <StandardButton>Login With Spotify</StandardButton>
           </div>
         </div>
       </div>

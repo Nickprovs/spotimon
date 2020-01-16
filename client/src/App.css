@@ -37,11 +37,11 @@
   height: 100%;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: minmax(0, 40%) minmax(0, 10%) minmax(0, 50%);
+  grid-template-rows: minmax(0, 41%) minmax(0, 8%) minmax(0, 51%);
   grid-template-areas:
     "p p p p p p p p p p p p"
     "b b b b b b b b b b b b"
-    "i i i i i i i i i i i e";
+    "i i i i i i i i i e e e";
 }
 
 @media (max-width: 600px) {
@@ -51,7 +51,7 @@
     height: 100%;
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: minmax(0, 40%) minmax(0, 10%) minmax(0, 40%) minmax(0, 10%);
+    grid-template-rows: minmax(0, 41%) minmax(0, 8%) minmax(0, 41%) minmax(0, 10%);
     grid-template-areas:
       "p p p p p p p p p p p p"
       "b b b b b b b b b b b b"
@@ -111,9 +111,14 @@
 
 /* Enter Page Grid - End*/
 
+/*For spacing between top level li's*/
+.info-area > ul > li {
+  margin-bottom: 20px;
+}
+
 .info-list {
   font-size: 3vmin;
-  margin: 10px;
+  margin: 5px;
 }
 
 li:not(:last-child) {
