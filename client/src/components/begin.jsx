@@ -57,7 +57,9 @@ class Begin extends Component {
               </ul> */}
         <div className="enter-area">
           <div className="enter-button-container">
-            <StandardButton>Login With Spotify</StandardButton>
+            <a href="http://localhost:8888/login">
+              <StandardButton>Login With Spotify</StandardButton>
+            </a>
           </div>
         </div>
       </div>
