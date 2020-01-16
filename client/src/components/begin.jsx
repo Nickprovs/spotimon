@@ -29,7 +29,7 @@ class Begin extends Component {
         </div>
 
         <div className="info-area">
-          <ul className="standard-text info-text info-list">
+          <ul className="standard-text info-list">
             <li>
               Requirements
               <ul>
@@ -42,7 +42,6 @@ class Begin extends Component {
               <ul>
                 <li>Explore your taste from most to least frequented genres.</li>
                 <li>Visualize your taste through the mass of your genres and the way they "bump" to the music.</li>
-
                 <li>Hit "Begin" to authenticate directly with Spotify.</li>
               </ul>
             </li>
