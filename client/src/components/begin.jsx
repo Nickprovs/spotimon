@@ -40,8 +40,8 @@ class Begin extends Component {
             <li>
               What Is This?
               <ul>
-                <li>Explore your recent musical taste from your most frequented to least frequented genres.</li>
-                <li>Visualize your taste by the size of the genres and the way they "bump" to the music.</li>
+                <li>Explore your taste from most to least frequented genres.</li>
+                <li>Visualize your taste through the mass of your genres and the way they "bump" to the music.</li>
 
                 <li>Hit "Begin" to authenticate directly with Spotify.</li>
               </ul>
@@ -57,7 +57,9 @@ class Begin extends Component {
                 <li>Hit "Begin" to authenticate directly with Spotify.</li>
               </ul> */}
         <div className="enter-area">
-          <StandardButton>Hi</StandardButton>
+          <div className="enter-button-container">
+            <StandardButton>Begin</StandardButton>
+          </div>
         </div>
       </div>
     );

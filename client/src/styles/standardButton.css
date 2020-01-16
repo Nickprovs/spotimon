@@ -1,12 +1,13 @@
 .standardButton {
   font-family: "Montserrat-ExtraLight";
+  font-size: 3vmin;
   color: var(--f1);
   background: var(--b1);
   border-color: var(--f1);
   border-radius: 4px;
   border-width: 0.75px;
   padding: 5px 7px;
-  min-width: 60px;
+  min-width: 90px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
