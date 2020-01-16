@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import ElementUtilities from "../lib/util/elementUtilities";
+import StandardButton from "./common/standardButton";
 
 class Begin extends Component {
   constructor() {
@@ -28,9 +28,37 @@ class Begin extends Component {
           </video>
         </div>
 
-        <div className="info-area">info</div>
+        <div className="info-area">
+          <ul className="standard-text info-text info-list">
+            <li>
+              Requirements
+              <ul>
+                <li>Spotify Premium Membership</li>
+                <li>Your "Liked Songs" Playlist must have some content.</li>
+              </ul>
+            </li>
+            <li>
+              What Is This?
+              <ul>
+                <li>Explore your recent musical taste from your most frequented to least frequented genres.</li>
+                <li>Visualize your taste by the size of the genres and the way they "bump" to the music.</li>
 
-        <div className="enter-area">enter</div>
+                <li>Hit "Begin" to authenticate directly with Spotify.</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        {/* What Is This?
+              <ul>
+                <li>Explore your recent musical taste from your most frequented to least frequented genres.</li>
+                <li>Visualize your taste by the size of the genres and the way they "bump" to the music.</li>
+
+                <li>Hit "Begin" to authenticate directly with Spotify.</li>
+              </ul> */}
+        <div className="enter-area">
+          <StandardButton>Hi</StandardButton>
+        </div>
       </div>
     );
   }
