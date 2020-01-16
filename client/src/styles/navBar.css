@@ -76,6 +76,7 @@
     border-top: 2px solid var(--f1);
   }
   .nav > .nav-links {
+    z-index: 1000;
     position: absolute;
     display: block;
     width: 100%;
