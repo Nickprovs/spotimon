@@ -9,13 +9,8 @@ class Begin extends Component {
   render() {
     return (
       <div className="enter-container">
-        <div style={{ backgroundColor: "orange" }} className="banner-area">
-          <div>hi</div>
-          <div>hi</div>
-          <div>hi</div>
-          <div>hi</div>
-          <div>hi</div>
-          <div>hi</div>
+        <div className="banner-area">
+          <h2 className="banner-text standard-text">The Universe Bumps With You</h2>
         </div>
         <div className="preview-area">
           <video
@@ -33,13 +28,9 @@ class Begin extends Component {
           </video>
         </div>
 
-        <div style={{ backgroundColor: "violet" }} className="info-area">
-          info
-        </div>
+        <div className="info-area">info</div>
 
-        <div style={{ backgroundColor: "aqua" }} className="enter-area">
-          enter
-        </div>
+        <div className="enter-area">enter</div>
       </div>
     );
   }

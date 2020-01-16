@@ -27,16 +27,10 @@ class App extends Component {
       <Theme variables={theme}>
         <BrowserRouter>
           <div className="app-container">
-            <div style={{ backgroundColor: "red" }} className="nav-area">
-              <div className="nav-area" style={{ backgroundColor: "red" }}>
-                <NavBar onThemeClick={this.handleToggleTheme.bind(this)} />
-              </div>
+            <div className="nav-area">
+              <NavBar onThemeClick={this.handleToggleTheme.bind(this)} />
             </div>
-            <div className="content-area">
-              <Begin />
-            </div>
-
-            {/*<div style={{ backgroundColor: "blue" }} className="content-area">
+            <div style={{ backgroundColor: "blue" }} className="content-area">
               <Switch>
                 <Route path="/playground" render={props => <Playground />} />
                 <Route path="/simulation" render={props => <Sposmos />} />
@@ -45,7 +39,7 @@ class App extends Component {
                 <Redirect exact from="/" to="/begin" />
                 <Redirect to="/not-found" />
               </Switch>
-            </div> */}
+            </div>
           </div>
         </BrowserRouter>
       </Theme>

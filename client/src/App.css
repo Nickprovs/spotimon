@@ -1,5 +1,6 @@
 .standard-text {
   font-family: "Montserrat-ExtraLight";
+  color: var(--f1);
 }
 
 .preview-video {
@@ -8,13 +9,11 @@
 }
 /* App Grid - Start*/
 .app-container {
-  background-color: green;
   width: 100%;
-  height: calc(100vh - 10px);
+  height: 100vh;
   display: grid;
-  grid-gap: 3px;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: 50px auto;
+  grid-template-rows: 45px calc(100% - 45px);
   grid-template-areas:
     "n n n n n n n n n n n n"
     "c c c c c c c c c c c c";
@@ -37,7 +36,7 @@
   display: grid;
   grid-gap: 3px;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: minmax(0, 10%) minmax(0, 40%) minmax(0, 60%);
+  grid-template-rows: minmax(0, 10%) minmax(0, 40%) minmax(0, 50%);
   grid-template-areas:
     "b b b b b b b b b b b b"
     "p p p p p p p p p p p p"
@@ -46,6 +45,7 @@
 
 .banner-area {
   grid-area: b;
+  background-color: var(--b3);
 }
 
 .preview-area {
@@ -54,9 +54,17 @@
 
 .info-area {
   grid-area: i;
+  background-color: var(--b2);
 }
 
 .enter-area {
   grid-area: e;
+  background-color: var(--b2);
 }
 /* Enter Page Grid - End*/
+
+.banner-text {
+  font-size: 3.5vmin;
+  text-align: center;
+  justify-self: center;
+}
