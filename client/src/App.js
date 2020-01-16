@@ -5,24 +5,34 @@ import Begin from "./components/begin";
 import NotFound from "./components/notFound";
 import Playground from "./components/playground";
 import Theme from "./components/common/theme";
+import Theming from "./lib/misc/themeing";
 import NavBar from "./components/navBar";
 
 import "./App.css";
 
 class App extends Component {
+  state = {
+    darkModeOn: true
+  };
   constructor() {
     super();
+    this.theming = new Theming();
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.setState({
+      darkModeOn: this.theming.getSavedDarkModeOnStatus()
+    });
+  }
 
   handleToggleTheme() {
-    console.log("theme toggled");
+    const darkModeOn = !this.state.darkModeOn;
+    this.setState({ darkModeOn });
+    this.theming.saveDarkModeOnStatus(darkModeOn);
   }
 
   render() {
-    const theme = Theme.Dark;
-
+    const theme = this.state.darkModeOn ? Theme.Dark : Theme.Light;
     return (
       <Theme variables={theme}>
         <BrowserRouter>

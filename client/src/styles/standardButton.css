@@ -2,8 +2,8 @@
   font-family: "Montserrat-Medium";
   font-size: 2.2vmin;
   letter-spacing: 1px;
-  color: var(--f1);
-  background: var(--s2);
+  color: var(--s2);
+  background: var(--s4);
   border-color: var(--f1);
   border-radius: 25px;
   border-width: 0px;
@@ -15,19 +15,19 @@
 
 @media (hover: hover) {
   .standardButton:hover {
-    background-color: var(--s3);
+    background-color: var(--s5);
   }
 }
 .standardButton:disabled,
 .standardButton[disabled] {
   cursor: not-allowed;
   border: solid;
-  background-color: var(--s4);
+  background-color: var(--s6);
   color: var(f1);
 }
 
 .standardButton:active {
-  background-color: var(--s4);
+  background-color: var(--s6);
 }
 
 .standardButton:focus {
