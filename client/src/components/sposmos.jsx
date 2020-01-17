@@ -6,6 +6,7 @@ import SpaceSimulator from "./common/spaceSimulator";
 import nBodyProblem from "../lib/simulation/nBodyProblem";
 import SimulationUtilities from "../lib/util/simulationUtilities";
 import ElementUtilities from "../lib/util/elementUtilities";
+import Slider from "./common/slider";
 
 const radius = 0.5;
 const trailLength = 8;
@@ -288,18 +289,15 @@ export default class Sposmos extends Component {
         </div>
 
         <div className="dashboard-area standard-text" ref={this.setHeader}>
-          {this.state.playRequested && (
-            <span>
-              <div>
-                <label>Current Playlist</label>
-              </div>
-              <div>
-                <a href={this.state.currentTrackData.playlist.external_urls.spotify} target="_blank">
-                  {this.state.currentTrackData.playlist.name}
-                </a>
-              </div>
-            </span>
-          )}
+          <div className="dashboard-info-area">
+            <Slider style={{ margin: "10px" }} />
+          </div>
+          <div className="dashboard-c1-area">
+            <Slider style={{ margin: "10px" }} />
+          </div>
+          <div className="dashboard-c2-area">
+            <Slider style={{ margin: "10px" }} />
+          </div>
         </div>
 
         <div ref={this.setFooter}>

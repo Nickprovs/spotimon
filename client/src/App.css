@@ -129,10 +129,40 @@ li:first-child {
   margin-top: 10px;
 }
 
+/* Dashboard area grid start */
+
 .dashboard-area {
   height: 55px;
+  width: 100%;
   background-color: var(--b2);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 55px;
+  grid-template-areas: "i i i i c1 c1 c1 c1 c2 c2 c2 c2";
 }
+
+.dashboard-info-area {
+  grid-area: i;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-c1-area {
+  grid-area: c1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-c2-area {
+  grid-area: c2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dashboard area grid end */
 
 .simulator-container {
   background-color: var(--b2);

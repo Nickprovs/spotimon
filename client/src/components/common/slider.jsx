@@ -1,0 +1,47 @@
+import React, { Component } from "react";
+import "../../styles/slider.css";
+
+class Slider extends Component {
+  state = {
+    value: 50,
+    min: 1,
+    max: 100
+  };
+
+  constructor(props) {
+    super(props);
+    this.handleInput = this.handleInput.bind(this);
+  }
+
+  componentDidMount() {
+    const { min, max, value } = this.props;
+    this.setState({ min });
+    this.setState({ max });
+    this.setState({ value });
+  }
+
+  handleInput(e) {
+    const { onChange } = this.props;
+    this.setState({ value: e.target.value });
+    if (onChange) onChange(this.state.value);
+  }
+
+  render() {
+    const { min, max, value } = this.state;
+
+    return (
+      <div class="slidecontainer">
+        <input
+          onChange={value => this.handleInput(value)}
+          type="range"
+          min={min}
+          max={max}
+          value={value}
+          class="slider"
+        />
+      </div>
+    );
+  }
+}
+
+export default Slider;
