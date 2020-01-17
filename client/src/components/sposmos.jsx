@@ -10,7 +10,7 @@ import ElementUtilities from "../lib/util/elementUtilities";
 const radius = 0.5;
 const trailLength = 8;
 const g = 39.5;
-const dt = 0.001; //0.005 years is equal to 1.825 days
+const dt = 0.0005; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
 const scale = 70;
 
@@ -305,6 +305,7 @@ export default class Sposmos extends Component {
         <div ref={this.setFooter}>
           <SpotifyPlayer
             styles={{
+              loaderColor: "var(--f1)",
               sliderHandleColor: "var(--f1)",
               sliderTrackColor: "var(--b3)",
               bgColor: "var(--b2)",
