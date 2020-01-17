@@ -40,7 +40,7 @@ class App extends Component {
             <div className="nav-area">
               <NavBar onThemeClick={this.handleToggleTheme.bind(this)} />
             </div>
-            <div style={{ backgroundColor: "blue" }} className="content-area">
+            <div className="content-area">
               <Switch>
                 <Route path="/playground" render={props => <Playground />} />
                 <Route path="/simulation" render={props => <Sposmos />} />

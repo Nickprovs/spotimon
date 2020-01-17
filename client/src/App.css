@@ -128,3 +128,8 @@ li:not(:last-child) {
 li:first-child {
   margin-top: 10px;
 }
+
+.dashboard-area {
+  height: 55px;
+  background-color: var(--b2);
+}

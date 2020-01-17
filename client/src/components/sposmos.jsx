@@ -23,14 +23,10 @@ export default class Sposmos extends Component {
     currentUris: [],
     accessToken: "",
     playlistStartOffset: 0,
-
-    nowPlaying: {
-      fetchingGenres: false,
-      name: "Not Checked",
-      image: ""
-    },
+    fetchingGenres: false,
     currentTrackData: {
       id: "",
+      playlist: null,
       analysis: null,
       progressInSeconds: 0,
       recentLoudnessData: []
@@ -49,6 +45,11 @@ export default class Sposmos extends Component {
 
     this.durationCheckTimerId = null;
     this.onDurationCheck = this.onDurationCheck.bind(this);
+
+    this.page = null;
+    this.setPage = element => {
+      this.page = element;
+    };
 
     this.canvas = null;
     this.setCanvas = element => {
@@ -76,10 +77,12 @@ export default class Sposmos extends Component {
   }
 
   setSimulatorSize() {
-    this.setState({ simulatorWidth: window.innerWidth });
+    if (!this.page) return;
+
+    this.setState({ simulatorWidth: ElementUtilities.getAbsoluteWidth(this.page) });
     this.setState({
       simulatorHeight:
-        window.innerHeight * 0.99 -
+        ElementUtilities.getAbsoluteHeight(this.page) * 0.99 -
         ElementUtilities.getAbsoluteHeight(this.header) -
         ElementUtilities.getAbsoluteHeight(this.footer)
     });
@@ -90,11 +93,14 @@ export default class Sposmos extends Component {
     this.setSimulatorSize();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const urlParams = SpotifyClient.getUrlHashParams();
     this.setState({ accessToken: urlParams.access_token });
     this.setSimulatorSize();
     window.addEventListener("resize", this.handleWindowResize);
+    console.log("footer", this.footer);
+    new ResizeObserver(this.handleWindowResize).observe(this.footer);
+    await this.fetchGenres();
   }
 
   componentWillUnmount() {
@@ -106,7 +112,7 @@ export default class Sposmos extends Component {
     if (nowPlaying) this.setState({ nowPlaying });
   }
 
-  async handleFetchGenres() {
+  async fetchGenres() {
     let uniqueGenreData = [];
     this.setState({ fetchingGenres: true });
     try {
@@ -119,7 +125,7 @@ export default class Sposmos extends Component {
       this.setState({ fetchingGenres: false });
     }
 
-    const genresToUseCount = Math.min(50, uniqueGenreData.length);
+    const genresToUseCount = Math.min(25, uniqueGenreData.length);
     const quarterSize = genresToUseCount.length / 4;
     const threeQuarterMark = 3 * (quarterSize - 1);
     const frequentedGenres = uniqueGenreData.slice(0, threeQuarterMark);
@@ -149,15 +155,20 @@ export default class Sposmos extends Component {
     const genreName = hitDetectedGravitationalObject.name;
     const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${genreName}`);
     const playlist = playlists.playlists.items[0];
+    console.log(playlist);
     const playlistOffset = Math.min(
       Math.floor(Math.random() * 100),
       Math.floor(Math.random() * playlist.tracks.total - 1)
     );
-    const res = await await this.spotifyClient.getPlaylistTracks(playlist.id, { offset: playlistOffset });
+
+    const res = await this.spotifyClient.getPlaylistTracks(playlist.id, { offset: playlistOffset });
     const song = res.items[0].track;
     console.log("playlist song", song);
     await this.updateNewTrackData(song.id);
 
+    let currentTrackData = { ...this.state.currentTrackData };
+    currentTrackData.playlist = playlist;
+    this.setState({ currentTrackData: currentTrackData });
     this.setState({ playlistStartOffset: playlistOffset });
     this.setState({ currentUris: [playlist.uri] });
     this.setState({ playRequested: true });
@@ -230,7 +241,7 @@ export default class Sposmos extends Component {
       const mass = this.state.simulationDriver.masses[i];
       if (!isNaN(timeCoeffecient))
         mass.manifestation.radius =
-          mass.manifestation.defaultRadius + 2.5 * mass.manifestation.defaultRadius * timeCoeffecient;
+          mass.manifestation.defaultRadius + 1.0 * mass.manifestation.defaultRadius * timeCoeffecient;
       // console.log("time coeff", timeCoeffecient,  "default radius", mass.manifestation.defaultRadius);
     }
     if (matchingSegmentForTime) {
@@ -261,24 +272,7 @@ export default class Sposmos extends Component {
     } = this.state;
 
     return (
-      <div className="App">
-        <div ref={this.setHeader}>
-          <a href="http://localhost:8888/login">
-            <button style={{ backgroundColor: "green" }}>Login With Spotify</button>
-          </a>
-
-          <div>Now Playing: {this.state.nowPlaying.name}</div>
-          <div>
-            <img style={{ width: 100 }} src={this.state.nowPlaying.image} />
-          </div>
-
-          <button onClick={() => this.handleGetNowPlaying()}>Check Now Playing</button>
-
-          <button disabled={this.state.fetchingGenres} onClick={() => this.handleFetchGenres()}>
-            Fetch Genres
-          </button>
-        </div>
-
+      <div ref={this.setPage} style={{ width: "100%", height: "100%" }}>
         <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
           <SpaceSimulator
             simulationDriver={simulationDriver}
@@ -293,8 +287,31 @@ export default class Sposmos extends Component {
           />
         </div>
 
+        <div className="dashboard-area standard-text" ref={this.setHeader}>
+          {this.state.playRequested && (
+            <span>
+              <div>
+                <label>Current Playlist</label>
+              </div>
+              <div>
+                <a href={this.state.currentTrackData.playlist.external_urls.spotify} target="_blank">
+                  {this.state.currentTrackData.playlist.name}
+                </a>
+              </div>
+            </span>
+          )}
+        </div>
+
         <div ref={this.setFooter}>
           <SpotifyPlayer
+            styles={{
+              sliderHandleColor: "var(--f1)",
+              sliderTrackColor: "var(--b3)",
+              bgColor: "var(--b2)",
+              color: "var(--f1)",
+              trackNameColor: "var(--f1)",
+              trackArtistColor: "var(--f1)"
+            }}
             showSaveIcon={true}
             offset={playlistStartOffset}
             callback={async state => this.handlePlayerStatusChange(state)}
