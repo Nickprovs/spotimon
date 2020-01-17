@@ -2,6 +2,7 @@ const LightTheme = {
   "--b1": "#ffffff",
   "--b2": "#e8e8e8",
   "--b3": "#dedede",
+  "--b4": "#d1d1d1",
   "--f1": "#000000",
   "--s1": "#000000",
   "--s2": "#FFFFFF",
