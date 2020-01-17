@@ -133,3 +133,7 @@ li:first-child {
   height: 55px;
   background-color: var(--b2);
 }
+
+.simulator-container {
+  background-color: var(--b2);
+}

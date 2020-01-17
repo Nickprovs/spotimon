@@ -272,7 +272,7 @@ export default class Sposmos extends Component {
     } = this.state;
 
     return (
-      <div ref={this.setPage} style={{ width: "100%", height: "100%" }}>
+      <div className="simulator-container" ref={this.setPage} style={{ width: "100%", height: "100%" }}>
         <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
           <SpaceSimulator
             simulationDriver={simulationDriver}
