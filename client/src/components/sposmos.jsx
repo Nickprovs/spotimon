@@ -319,7 +319,7 @@ export default class Sposmos extends Component {
           <SpaceSimulator
             simulationDriver={simulationDriver}
             isEnabled={simulatorEnabled}
-            backgroundColor={"#0c1d40"}
+            backgroundColor={"var(--s7)"}
             width={simulatorWidth}
             height={simulatorHeight}
             cursor={simulationCursor}

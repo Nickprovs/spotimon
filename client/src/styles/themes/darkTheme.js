@@ -9,7 +9,8 @@ const DarkTheme = {
   "--s3": "#33C9FF",
   "--s4": "#1DB954",
   "--s5": "#1ED75F",
-  "--s6": "#5EAE59"
+  "--s6": "#5EAE59",
+  "--s7": "#0A1136"
 };
 
 export default DarkTheme;
