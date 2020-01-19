@@ -14,7 +14,8 @@ class Slider extends Component {
   }
 
   componentDidMount() {
-    const { min, max, value } = this.props;
+    const { min, max, value, step } = this.props;
+    this.setState({ step });
     this.setState({ min });
     this.setState({ max });
     this.setState({ value });
@@ -27,11 +28,12 @@ class Slider extends Component {
   }
 
   render() {
-    const { min, max, value } = this.state;
+    const { min, max, value, step } = this.state;
 
     return (
       <div class="slidecontainer">
         <input
+          step={step}
           onChange={value => this.handleInput(value)}
           type="range"
           min={min}

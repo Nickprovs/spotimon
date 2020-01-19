@@ -4,6 +4,7 @@ export default class CelestialBodyManifestation {
     this.trailLength = manifestationArgs.trailLength;
     this.radius = manifestationArgs.radius;
     this.defaultRadius = manifestationArgs.defaultRadius;
+    this.defaultMass = manifestationArgs.defaultMass;
     this.primaryColor = {
       r: Math.floor(Math.random() * 256), // Random between 0-255
       g: Math.floor(Math.random() * 256), // Random between 0-255

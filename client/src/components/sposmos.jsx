@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import SpotifyClient from "../lib/spotify/spotifyClient";
 import CelestialBody from "../lib/simulation/celestialBody";
+import CelestialBodyManifestation from "../lib/simulation/celestialBodyManifestation";
 import SpotifyPlayer from "react-spotify-web-playback";
 import SpaceSimulator from "./common/spaceSimulator";
 import nBodyProblem from "../lib/simulation/nBodyProblem";
@@ -11,7 +12,7 @@ import Slider from "./common/slider";
 const radius = 0.5;
 const trailLength = 8;
 const g = 39.5;
-const dt = 0.0005; //0.005 years is equal to 1.825 days
+let dt = 0.0005; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
 const scale = 70;
 
@@ -134,7 +135,10 @@ export default class Sposmos extends Component {
     const genres = frequentedGenres.concat(unfrequentedGenres);
 
     for (let genre of genres) {
+      const defaultMass = 3.0024584e-6 * Math.pow(genre.count, 3.33);
+
       const manifestationArgs = {
+        defaultMass: defaultMass,
         trailLength: trailLength,
         defaultRadius: radius * genre.count,
         radius: radius * genre.count
@@ -142,7 +146,7 @@ export default class Sposmos extends Component {
 
       const celestialBodyArgs = {
         name: genre.name,
-        m: 3.0024584e-6 * Math.pow(genre.count, 3.33),
+        m: defaultMass,
         ...SimulationUtilities.getRandomGravitationalObjectData()
       };
 
@@ -257,6 +261,22 @@ export default class Sposmos extends Component {
     this.setState({ currentTrackData });
   }
 
+  handleDeltaTChange(newDt) {
+    dt = newDt;
+    this.state.simulationDriver.dt = newDt;
+  }
+  handleMassChange(factor) {
+    console.log("hi");
+    for (let i = 0; i < this.state.simulationDriver.masses.length - 1; i++) {
+      const celestialBody = this.state.simulationDriver.masses[i];
+      const newMass = celestialBody.manifestation.defaultMass * factor;
+      const newRadius = celestialBody.manifestation.defaultRadius * factor;
+      celestialBody.m = newMass;
+      celestialBody.manifestation.radius = newRadius;
+      celestialBody.manifestation.defaultRadius = newRadius;
+    }
+  }
+
   //test
   render() {
     const {
@@ -269,8 +289,22 @@ export default class Sposmos extends Component {
       accessToken,
       canvasClickable,
       currentUris,
+      currentTrackData,
       playRequested
     } = this.state;
+
+    let playlistImageUrl = "";
+    if (currentTrackData.playlist && currentTrackData.playlist.images)
+      playlistImageUrl = currentTrackData.playlist.images[0].url;
+
+    let playlistWebPlayerUrl = "";
+    if (currentTrackData.playlist && currentTrackData.playlist.external_urls)
+      playlistWebPlayerUrl = currentTrackData.playlist.external_urls.spotify;
+
+    let playlistName = "";
+    if (currentTrackData.playlist) playlistName = currentTrackData.playlist.name;
+
+    console.log(playlistImageUrl);
 
     return (
       <div className="simulator-container" ref={this.setPage} style={{ width: "100%", height: "100%" }}>
@@ -290,13 +324,46 @@ export default class Sposmos extends Component {
 
         <div className="dashboard-area standard-text" ref={this.setHeader}>
           <div className="dashboard-info-area">
-            <Slider style={{ margin: "10px" }} />
+            <img style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
+            <div>
+              <label>Playlist</label>
+              <br />
+              <a target="_blank" href={playlistWebPlayerUrl}>
+                {playlistName}
+              </a>
+            </div>
           </div>
+
+          {/* Time Slider */}
           <div className="dashboard-c1-area">
-            <Slider style={{ margin: "10px" }} />
+            <div className="dashboard-section">
+              <label>Time</label>
+              <br />
+              <Slider
+                step={0.000001}
+                min={0.00001}
+                value={0.0005}
+                max={0.002}
+                onChange={this.handleDeltaTChange.bind(this)}
+                style={{ margin: "10px" }}
+              />
+            </div>
           </div>
+
+          {/* Mass Slider */}
           <div className="dashboard-c2-area">
-            <Slider style={{ margin: "10px" }} />
+            <div className="dashboard-section">
+              <label>Mass</label>
+              <br />
+              <Slider
+                step={0.1}
+                min={0.1}
+                value={1}
+                max={3}
+                onChange={this.handleMassChange.bind(this)}
+                style={{ margin: "10px" }}
+              />
+            </div>
           </div>
         </div>
 
