@@ -277,6 +277,17 @@ export default class Sposmos extends Component {
     }
   }
 
+  handlePlaylistClick() {
+    const { currentTrackData } = this.state;
+    let playlistWebPlayerUrl = "";
+    if (currentTrackData.playlist && currentTrackData.playlist.external_urls)
+      playlistWebPlayerUrl = currentTrackData.playlist.external_urls.spotify;
+
+    if (!playlistWebPlayerUrl) return;
+
+    window.open(playlistWebPlayerUrl, "_newtab");
+  }
+
   //test
   render() {
     const {
@@ -297,17 +308,13 @@ export default class Sposmos extends Component {
     if (currentTrackData.playlist && currentTrackData.playlist.images)
       playlistImageUrl = currentTrackData.playlist.images[0].url;
 
-    let playlistWebPlayerUrl = "";
-    if (currentTrackData.playlist && currentTrackData.playlist.external_urls)
-      playlistWebPlayerUrl = currentTrackData.playlist.external_urls.spotify;
-
     let playlistName = "";
     if (currentTrackData.playlist) playlistName = currentTrackData.playlist.name;
 
     console.log(playlistImageUrl);
 
     return (
-      <div className="simulator-container" ref={this.setPage} style={{ width: "100%", height: "100%" }}>
+      <div className="simulator-container dashboard-text" ref={this.setPage} style={{ width: "100%", height: "100%" }}>
         <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
           <SpaceSimulator
             simulationDriver={simulationDriver}
@@ -323,20 +330,22 @@ export default class Sposmos extends Component {
         </div>
 
         <div className="dashboard-area standard-text" ref={this.setHeader}>
-          <div className="dashboard-info-area">
-            <img style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
-            <div>
-              <label>Playlist</label>
-              <br />
-              <a target="_blank" href={playlistWebPlayerUrl}>
-                {playlistName}
-              </a>
+          {playRequested && (
+            <div className="dashboard-info-area playlist-section">
+              <div onClick={this.handlePlaylistClick.bind(this)} className="dashboard-section-left playlist-section">
+                <img style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
+                <div style={{ marginLeft: "4px" }}>
+                  <label style={{ cursor: "inherit" }}>Playlist</label>
+                  <br />
+                  <label style={{ cursor: "inherit" }}>{playlistName}</label>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Time Slider */}
           <div className="dashboard-c1-area">
-            <div className="dashboard-section">
+            <div className="dashboard-section-center">
               <label>Time</label>
               <br />
               <Slider
@@ -352,7 +361,7 @@ export default class Sposmos extends Component {
 
           {/* Mass Slider */}
           <div className="dashboard-c2-area">
-            <div className="dashboard-section">
+            <div className="dashboard-section-center">
               <label>Mass</label>
               <br />
               <Slider

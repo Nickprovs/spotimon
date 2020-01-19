@@ -22,9 +22,10 @@ class Slider extends Component {
   }
 
   handleInput(e) {
+    console.log("test", e.target.value);
     const { onChange } = this.props;
     this.setState({ value: e.target.value });
-    if (onChange) onChange(this.state.value);
+    if (onChange) onChange(e.target.value);
   }
 
   render() {

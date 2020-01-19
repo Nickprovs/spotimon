@@ -12,7 +12,7 @@
   width: 100%;
   height: 100vh;
   background-color: var(--s4);
-
+  overflow: hidden;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-template-rows: 47px calc(100% - 50px);
@@ -168,11 +168,27 @@ li:first-child {
   background-color: var(--b2);
 }
 
-.dashboard-section {
+.dashboard-section-center {
   width: 100%;
   height: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+}
+
+.dashboard-section-left {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: left baseline;
+}
+
+.dashboard-text {
+  font-size: 2.1vmin;
+}
+
+.playlist-section {
+  cursor: pointer;
 }
