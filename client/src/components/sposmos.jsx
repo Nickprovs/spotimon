@@ -144,12 +144,13 @@ export default class Sposmos extends Component {
       };
 
       const spatialArgs = {
-        name: genre.name,
         m: defaultMass,
         ...SimulationUtilities.getRandomGravitationalObjectData()
       };
 
-      const domainArgs = {};
+      const domainArgs = {
+        genre: genre
+      };
 
       let mass = new NBodyItem(spatialArgs, manifestationArgs, domainArgs);
       this.state.simulationDriver.masses.push(mass);
@@ -158,7 +159,7 @@ export default class Sposmos extends Component {
   }
 
   async handleGenreClick(hitDetectedGravitationalObject) {
-    const genreName = hitDetectedGravitationalObject.spatial.name;
+    const genreName = hitDetectedGravitationalObject.domain.genre.name;
     const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${genreName}`);
     const playlist = playlists.playlists.items[0];
     console.log(playlist);
