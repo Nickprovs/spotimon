@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import SpotifyClient from "../lib/spotify/spotifyClient";
 import NBodyItem from "../lib/simulation/nBodyItem";
+import DomainInfo from "../lib/simulation/info/domainInfo";
 import SpotifyPlayer from "react-spotify-web-playback";
 import SpaceSimulator from "./common/spaceSimulator";
 import nBodyProblem from "../lib/simulation/nBodyProblem";
@@ -8,7 +9,6 @@ import SimulationUtilities from "../lib/util/simulationUtilities";
 import ElementUtilities from "../lib/util/elementUtilities";
 import Slider from "./common/slider";
 
-const radius = 0.5;
 const trailLength = 8;
 const g = 39.5;
 let dt = 0.0005; //0.005 years is equal to 1.825 days
@@ -134,13 +134,12 @@ export default class Sposmos extends Component {
     const genres = frequentedGenres.concat(unfrequentedGenres);
 
     for (let genre of genres) {
-      const defaultMass = 3.0024584e-6 * Math.pow(genre.count, 3.33);
+      const defaultMass = DomainInfo.getDefaultBasslineMassFromGenreCount(genre.count);
 
       const manifestationArgs = {
         defaultMass: defaultMass,
         trailLength: trailLength,
-        defaultRadius: radius * genre.count,
-        radius: radius * genre.count
+        radius: DomainInfo.getDefaultBasslineRadiusFromGenreCount(genre.count)
       };
 
       const spatialArgs = {
@@ -246,10 +245,9 @@ export default class Sposmos extends Component {
     this.state.simulationDriver.dt = 3 * dt * timeCoeffecient;
     for (let i = 0; i < this.state.simulationDriver.masses.length - 1; i++) {
       const mass = this.state.simulationDriver.masses[i];
-      if (!isNaN(timeCoeffecient))
-        mass.manifestation.radius =
-          mass.manifestation.defaultRadius + 1.0 * mass.manifestation.defaultRadius * timeCoeffecient;
-      // console.log("time coeff", timeCoeffecient,  "default radius", mass.manifestation.defaultRadius);
+      if (!isNaN(timeCoeffecient)) {
+        mass.manifestation.radius = mass.domain.basslineRadius + 1.0 * mass.domain.basslineRadius * timeCoeffecient;
+      }
     }
     if (matchingSegmentForTime) {
       currentTrackData.recentLoudnessData.push(matchingSegmentForTime.loudness_start);
@@ -270,12 +268,17 @@ export default class Sposmos extends Component {
   handleMassChange(factor) {
     console.log("hi");
     for (let i = 0; i < this.state.simulationDriver.masses.length - 1; i++) {
-      const celestialBody = this.state.simulationDriver.masses[i];
-      const newMass = celestialBody.manifestation.defaultMass * factor;
-      const newRadius = celestialBody.manifestation.defaultRadius * factor;
-      celestialBody.spatial.m = newMass;
-      celestialBody.manifestation.radius = newRadius;
-      celestialBody.manifestation.defaultRadius = newRadius;
+      const mass = this.state.simulationDriver.masses[i];
+      const defaultBassLineMass = DomainInfo.getDefaultBasslineMassFromGenreCount(mass.domain.genre.count);
+      const defaultBassLineRadius = DomainInfo.getDefaultBasslineRadiusFromGenreCount(mass.domain.genre.count);
+      const newBasslineMass = defaultBassLineMass * factor;
+      const newBasslineRadius = defaultBassLineRadius * factor;
+
+      mass.domain.basslineMass = newBasslineMass;
+      mass.domain.basslineRadius = newBasslineRadius;
+
+      mass.spatial.m = newBasslineMass;
+      mass.manifestation.radius = newBasslineRadius;
     }
   }
 
