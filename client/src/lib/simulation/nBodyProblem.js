@@ -45,11 +45,11 @@ export default class nBodyProblem {
       let ay = 0;
       let az = 0;
 
-      const massI = this.masses[i];
+      const massI = this.masses[i].spatial;
 
       for (let j = 0; j < massesLen; j++) {
         if (i !== j) {
-          const massJ = this.masses[j];
+          const massJ = this.masses[j].spatial;
           const dx = massJ.x - massI.x;
           const dy = massJ.y - massI.y;
           const dz = massJ.z - massI.z;
