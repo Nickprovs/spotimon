@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import SpotifyClient from "../lib/spotify/spotifyClient";
-import CelestialBody from "../lib/simulation/celestialBody";
-import CelestialBodyManifestation from "../lib/simulation/celestialBodyManifestation";
+import NBodyItem from "../lib/simulation/nBodyItem";
 import SpotifyPlayer from "react-spotify-web-playback";
 import SpaceSimulator from "./common/spaceSimulator";
 import nBodyProblem from "../lib/simulation/nBodyProblem";
@@ -144,20 +143,22 @@ export default class Sposmos extends Component {
         radius: radius * genre.count
       };
 
-      const celestialBodyArgs = {
+      const spatialArgs = {
         name: genre.name,
         m: defaultMass,
         ...SimulationUtilities.getRandomGravitationalObjectData()
       };
 
-      let mass = new CelestialBody(celestialBodyArgs, manifestationArgs);
+      const domainArgs = {};
+
+      let mass = new NBodyItem(spatialArgs, manifestationArgs, domainArgs);
       this.state.simulationDriver.masses.push(mass);
     }
     this.setState({ simulatorEnabled: true });
   }
 
   async handleGenreClick(hitDetectedGravitationalObject) {
-    const genreName = hitDetectedGravitationalObject.name;
+    const genreName = hitDetectedGravitationalObject.spatial.name;
     const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${genreName}`);
     const playlist = playlists.playlists.items[0];
     console.log(playlist);
@@ -271,7 +272,7 @@ export default class Sposmos extends Component {
       const celestialBody = this.state.simulationDriver.masses[i];
       const newMass = celestialBody.manifestation.defaultMass * factor;
       const newRadius = celestialBody.manifestation.defaultRadius * factor;
-      celestialBody.m = newMass;
+      celestialBody.spatial.m = newMass;
       celestialBody.manifestation.radius = newRadius;
       celestialBody.manifestation.defaultRadius = newRadius;
     }

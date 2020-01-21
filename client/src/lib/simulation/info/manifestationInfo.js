@@ -1,5 +1,4 @@
-//How masses store themselves visually
-export default class CelestialBodyManifestation {
+export default class ManifestationInfo {
   constructor(manifestationArgs) {
     this.trailLength = manifestationArgs.trailLength;
     this.radius = manifestationArgs.radius;

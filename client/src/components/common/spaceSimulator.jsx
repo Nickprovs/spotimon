@@ -36,48 +36,52 @@ class SpaceSimulator extends Component {
 
     for (let i = 0; i < simulationDriver.masses.length; i++) {
       const massI = simulationDriver.masses[i];
-      const x = width / 2 + massI.x * simulationDriver.scale;
-      const y = height / 2 + massI.y * simulationDriver.scale;
+      const x = width / 2 + massI.spatial.x * simulationDriver.scale;
+      const y = height / 2 + massI.spatial.y * simulationDriver.scale;
 
       massI.manifestation.draw(this.canvasContext, x, y);
 
-      if (massI.name) {
+      if (massI.spatial.name) {
         this.canvasContext.fillStyle = "white";
         this.canvasContext.font = "16px Arial";
-        this.canvasContext.fillText(massI.name, x + massI.manifestation.radius + 2, y - massI.manifestation.radius - 2);
+        this.canvasContext.fillText(
+          massI.spatial.name,
+          x + massI.manifestation.radius + 2,
+          y - massI.manifestation.radius - 2
+        );
       }
 
       const edgeX = width / 2 / simulationDriver.scale;
       //Past Negative X Dir
-      if (massI.x < -edgeX) {
-        massI.x = edgeX;
-        massI.y *= -1;
-        massI.vx /= 2;
+      if (massI.spatial.x < -edgeX) {
+        massI.spatial.x = edgeX;
+        massI.spatial.y *= -1;
+        massI.spatial.vx /= 2;
         continue;
       }
 
       //Past Positive X Dir
-      if (massI.x > edgeX) {
-        massI.x = -edgeX;
-        massI.y *= -1;
-        massI.vx /= 2;
+      if (massI.spatial.x > edgeX) {
+        massI.spatial.x = -edgeX;
+        massI.spatial.y *= -1;
+        massI.spatial.vx /= 2;
         continue;
       }
 
       const edgeY = height / 2 / simulationDriver.scale;
       //Past Negative Y Dir
-      if (massI.y < -edgeY) {
-        massI.y = edgeY;
-        massI.x *= -1;
-        massI.vy /= 2;
+      if (massI.spatial.y < -edgeY) {
+        massI.spatial.y = edgeY;
+        massI.spatial.x *= -1;
+        massI.spatial.vy /= 2;
         continue;
       }
 
       //Past Negative Y Dir
-      if (massI.y > edgeY) {
-        massI.y = -edgeY;
-        massI.x *= -1;
-        massI.vy /= 2;
+      if (massI.spatial.y > edgeY) {
+        massI.spatial.y = -edgeY;
+        massI.spatial.x *= -1;
+        massI.spatial.vy /= 2;
         continue;
       }
     }
