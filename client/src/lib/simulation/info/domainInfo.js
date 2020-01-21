@@ -1,3 +1,5 @@
 export default class DomainInfo {
-  constructor(domainArgs) {}
+  constructor(domainArgs) {
+    this.genre = domainArgs.genre;
+  }
 }

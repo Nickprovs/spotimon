@@ -32,7 +32,7 @@ class Slider extends Component {
     const { min, max, value, step } = this.state;
 
     return (
-      <div class="slidecontainer">
+      <div className="slidecontainer">
         <input
           step={step}
           onChange={value => this.handleInput(value)}
@@ -40,7 +40,7 @@ class Slider extends Component {
           min={min}
           max={max}
           value={value}
-          class="slider"
+          className="slider"
         />
       </div>
     );
