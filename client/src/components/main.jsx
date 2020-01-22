@@ -10,8 +10,9 @@ import Callback from "./callback";
 import Issue from "./issue";
 import { withRouter, Route, Redirect, Switch } from "react-router-dom";
 import SpotifyClient from "../lib/http/spotifyClient";
+import authService from "../lib/http/authService";
 
-const tokenValidityTime = 5000; //3500000;
+const tokenValidityTime = 3500000; //3500000;
 
 class Main extends Component {
   state = {
@@ -72,13 +73,26 @@ class Main extends Component {
       return;
     }
 
-    this.props.history.push({ pathname: "/simulation" });
     this.setState({ accessToken: urlParams.access_token });
-    setInterval(this.handleTokenTimeout, tokenValidityTime);
+    this.refreshToken = urlParams.refresh_token;
+    this.props.history.push({ pathname: "/simulation" });
+    setTimeout(this.handleTokenTimeout, tokenValidityTime);
   }
 
-  handleTokenTimeout() {
+  async handleTokenTimeout() {
     console.log("going to try and request a new token");
+    try {
+      const res = await authService.getNewAccessToken(this.refreshToken);
+      const token = res.data.access_token;
+      this.spotifyClient.setAccessToken(token);
+      this.setState({ accessToken: token });
+    } catch (ex) {
+      this.props.history.push({
+        pathname: "/issue",
+        state: { issue: "Couldn't refresh spotify authentication. Please navigate to the home page and try again." }
+      });
+      return;
+    }
   }
 
   render() {
