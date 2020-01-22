@@ -1,17 +1,6 @@
 import Spotify from "spotify-web-api-js";
 //Wraps JPerez this.spotifyWebApi and exposes domain-specific functionality we need
 class SpotifyClient extends Spotify {
-  static getUrlHashParams() {
-    var hashParams = {};
-    var e,
-      r = /([^&;=]+)=?([^&;]*)/g,
-      q = window.location.hash.substring(1);
-    while ((e = r.exec(q))) {
-      hashParams[e[1]] = decodeURIComponent(e[2]);
-    }
-    return hashParams;
-  }
-
   isLoggedIn() {
     return this.getAccessToken() === true;
   }
