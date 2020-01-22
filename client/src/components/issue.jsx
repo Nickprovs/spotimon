@@ -1,10 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
 
-class Issue extends Component {
-  state = {};
-  render() {
-    return <h1>Issue</h1>;
-  }
-}
+const Issue = ({ history }) => {
+  let issue = "Issue";
+  if (history.location.state && history.location.state.issue) issue = history.location.state.issue;
+
+  return (
+    <div className="center-wrapper">
+      <h1 className="standard-text">{issue}</h1>
+    </div>
+  );
+};
 
 export default Issue;

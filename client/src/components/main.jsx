@@ -6,16 +6,22 @@ import Begin from "./begin";
 import NotFound from "./notFound";
 import Playground from "./playground";
 import NavBar from "./navBar";
-import { Route, Redirect, Switch } from "react-router-dom";
+import Callback from "./callback";
+import Issue from "./issue";
+import { withRouter, Route, Redirect, Switch } from "react-router-dom";
+import SpotifyClient from "../lib/spotify/spotifyClient";
 
 class Main extends Component {
   state = {
-    darkModeOn: true
+    darkModeOn: true,
+    accessToken: ""
   };
 
   constructor() {
     super();
     this.theming = new Theming();
+    this.refreshToken = "";
+    this.spotifyClient = new SpotifyClient();
   }
 
   componentDidMount() {
@@ -28,6 +34,29 @@ class Main extends Component {
     const darkModeOn = !this.state.darkModeOn;
     this.setState({ darkModeOn });
     this.theming.saveDarkModeOnStatus(darkModeOn);
+  }
+
+  async handleCallback(urlParams) {
+    if (!urlParams.access_token || !urlParams.refresh_token)
+      this.props.history.push({ pathname: "/issue", state: { issue: "Data was not passed from spotify callback." } });
+
+    this.spotifyClient.setAccessToken(urlParams.access_token);
+
+    let userProfile = null;
+    try {
+      userProfile = await this.spotifyClient.getMe();
+    } catch (ex) {
+      this.props.history.push({ pathname: "/issue", state: { issue: "Could not retrieve user profile." } });
+    }
+
+    if (!userProfile)
+      this.props.history.push({ pathname: "/issue", state: { issue: "Could not retrieve user profile." } });
+
+    if (userProfile.product != "premium")
+      this.props.history.push({ pathname: "/issue", state: { issue: "Spotify premium is required for this app." } });
+
+    this.refreshToken = urlParams.refresh_token;
+    this.setState({ accessToken: urlParams.access_token });
   }
 
   render() {
@@ -44,6 +73,8 @@ class Main extends Component {
               <Route path="/playground" render={props => <Playground />} />
               <Route path="/simulation" render={props => <Sposmos />} />
               <Route path="/begin" render={props => <Begin />} />
+              <Route path="/callback" render={props => <Callback onCallback={this.handleCallback.bind(this)} />} />
+              <Route path="/issue" component={Issue} />
               <Route path="/not-found" render={props => <NotFound />} />
               <Redirect exact from="/" to="/begin" />
               <Redirect to="/not-found" />
@@ -55,4 +86,4 @@ class Main extends Component {
   }
 }
 
-export default Main;
+export default withRouter(Main);
