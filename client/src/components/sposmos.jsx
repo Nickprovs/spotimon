@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import SpotifyClient from "../lib/spotify/spotifyClient";
 import NBodyItem from "../lib/simulation/nBodyItem";
 import DomainInfo from "../lib/simulation/info/domainInfo";
 import SpotifyPlayer from "react-spotify-web-playback";
@@ -22,7 +21,6 @@ export default class Sposmos extends Component {
     simulationHeight: 0,
     simulationCursor: "default",
     currentUris: [],
-    accessToken: "",
     playlistStartOffset: 0,
     fetchingGenres: false,
     currentTrackData: {
@@ -38,9 +36,6 @@ export default class Sposmos extends Component {
 
   constructor() {
     super();
-    const urlParams = SpotifyClient.getUrlHashParams();
-    this.spotifyClient = new SpotifyClient();
-    this.spotifyClient.setAccessToken(urlParams.access_token);
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
 
@@ -95,8 +90,6 @@ export default class Sposmos extends Component {
   }
 
   async componentDidMount() {
-    const urlParams = SpotifyClient.getUrlHashParams();
-    this.setState({ accessToken: urlParams.access_token });
     this.setSimulatorSize();
     window.addEventListener("resize", this.handleWindowResize);
     console.log("footer", this.footer);
@@ -109,17 +102,20 @@ export default class Sposmos extends Component {
   }
 
   async handleGetNowPlaying() {
-    const nowPlaying = await this.spotifyClient.getNowPlayingAsync();
+    const { spotifyClient } = this.props;
+    const nowPlaying = await spotifyClient.getNowPlayingAsync();
     if (nowPlaying) this.setState({ nowPlaying });
   }
 
   async fetchGenres() {
     let uniqueGenreData = [];
+    const { spotifyClient } = this.props;
+
     this.setState({ fetchingGenres: true });
     try {
-      const savedTracks = await this.spotifyClient.getSavedTracksAsync(300);
-      const savedArtists = await this.spotifyClient.getArtistsFromTracksAsync(savedTracks);
-      uniqueGenreData = this.spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
+      const savedTracks = await spotifyClient.getSavedTracksAsync(300);
+      const savedArtists = await spotifyClient.getArtistsFromTracksAsync(savedTracks);
+      uniqueGenreData = spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
     } catch (ex) {
       console.log(ex);
     } finally {
@@ -158,8 +154,10 @@ export default class Sposmos extends Component {
   }
 
   async handleGenreClick(hitDetectedGravitationalObject) {
+    const { spotifyClient } = this.props;
+
     const genreName = hitDetectedGravitationalObject.domain.genre.name;
-    const playlists = await this.spotifyClient.searchPlaylists(`the sound of ${genreName}`);
+    const playlists = await spotifyClient.searchPlaylists(`the sound of ${genreName}`);
     const playlist = playlists.playlists.items[0];
     console.log(playlist);
     const playlistOffset = Math.min(
@@ -167,7 +165,7 @@ export default class Sposmos extends Component {
       Math.floor(Math.random() * playlist.tracks.total - 1)
     );
 
-    const res = await this.spotifyClient.getPlaylistTracks(playlist.id, { offset: playlistOffset });
+    const res = await spotifyClient.getPlaylistTracks(playlist.id, { offset: playlistOffset });
     const song = res.items[0].track;
     console.log("playlist song", song);
     await this.updateNewTrackData(song.id);
@@ -256,7 +254,9 @@ export default class Sposmos extends Component {
   }
 
   async updateNewTrackData(trackId) {
-    const res = await this.spotifyClient.getAudioAnalysisForTrack(trackId);
+    const { spotifyClient } = this.props;
+
+    const res = await spotifyClient.getAudioAnalysisForTrack(trackId);
     const currentTrackData = { ...this.state.currentTrackData, id: trackId, analysis: res, progressInSeconds: 0 };
     this.setState({ currentTrackData });
   }
@@ -302,12 +302,13 @@ export default class Sposmos extends Component {
       simulatorWidth,
       simulatorHeight,
       playlistStartOffset,
-      accessToken,
       canvasClickable,
       currentUris,
       currentTrackData,
       playRequested
     } = this.state;
+
+    const { accessToken } = this.props;
 
     let playlistImageUrl = "";
     if (currentTrackData.playlist && currentTrackData.playlist.images)

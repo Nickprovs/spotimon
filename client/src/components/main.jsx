@@ -47,20 +47,26 @@ class Main extends Component {
       userProfile = await this.spotifyClient.getMe();
     } catch (ex) {
       this.props.history.push({ pathname: "/issue", state: { issue: "Could not retrieve user profile." } });
+      return;
     }
 
-    if (!userProfile)
+    if (!userProfile) {
       this.props.history.push({ pathname: "/issue", state: { issue: "Could not retrieve user profile." } });
+      return;
+    }
 
-    if (userProfile.product != "premium")
+    if (userProfile.product != "premium") {
       this.props.history.push({ pathname: "/issue", state: { issue: "Spotify premium is required for this app." } });
+      return;
+    }
 
-    this.refreshToken = urlParams.refresh_token;
+    this.props.history.push({ pathname: "/simulation" });
     this.setState({ accessToken: urlParams.access_token });
   }
 
   render() {
     const theme = this.state.darkModeOn ? Theme.Dark : Theme.Light;
+    const { accessToken } = this.state;
 
     return (
       <Theme variables={theme}>
@@ -71,7 +77,10 @@ class Main extends Component {
           <div className="content-area">
             <Switch>
               <Route path="/playground" render={props => <Playground />} />
-              <Route path="/simulation" render={props => <Sposmos />} />
+              <Route
+                path="/simulation"
+                render={props => <Sposmos spotifyClient={this.spotifyClient} accessToken={accessToken} />}
+              />
               <Route path="/begin" render={props => <Begin />} />
               <Route path="/callback" render={props => <Callback onCallback={this.handleCallback.bind(this)} />} />
               <Route path="/issue" component={Issue} />
