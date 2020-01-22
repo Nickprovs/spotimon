@@ -9,7 +9,9 @@ import NavBar from "./navBar";
 import Callback from "./callback";
 import Issue from "./issue";
 import { withRouter, Route, Redirect, Switch } from "react-router-dom";
-import SpotifyClient from "../lib/spotify/spotifyClient";
+import SpotifyClient from "../lib/http/spotifyClient";
+
+const tokenValidityTime = 5000; //3500000;
 
 class Main extends Component {
   state = {
@@ -22,12 +24,22 @@ class Main extends Component {
     this.theming = new Theming();
     this.refreshToken = "";
     this.spotifyClient = new SpotifyClient();
+
+    this.handleTokenTimeout = this.handleTokenTimeout.bind(this);
   }
 
   componentDidMount() {
     this.setState({
       darkModeOn: this.theming.getSavedDarkModeOnStatus()
     });
+
+    this.redirectIfOnInvalidPageForState();
+  }
+
+  redirectIfOnInvalidPageForState() {
+    console.log("mounted at", this.props.location.pathname);
+    if (this.props.location.pathname == "/simulation" && !this.state.accessToken)
+      this.props.history.push({ pathname: "/begin" });
   }
 
   handleToggleTheme() {
@@ -62,6 +74,11 @@ class Main extends Component {
 
     this.props.history.push({ pathname: "/simulation" });
     this.setState({ accessToken: urlParams.access_token });
+    setInterval(this.handleTokenTimeout, tokenValidityTime);
+  }
+
+  handleTokenTimeout() {
+    console.log("going to try and request a new token");
   }
 
   render() {
