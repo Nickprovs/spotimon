@@ -12,7 +12,7 @@ import { withRouter, Route, Redirect, Switch } from "react-router-dom";
 import SpotifyClient from "../lib/http/spotifyClient";
 import authService from "../lib/http/authService";
 
-const tokenValidityTime = 3500000; //3500000;
+const tokenValidityTime = 3500000;
 
 class Main extends Component {
   state = {
@@ -76,7 +76,7 @@ class Main extends Component {
     this.setState({ accessToken: urlParams.access_token });
     this.refreshToken = urlParams.refresh_token;
     this.props.history.push({ pathname: "/simulation" });
-    setTimeout(this.handleTokenTimeout, tokenValidityTime);
+    setInterval(this.handleTokenTimeout, tokenValidityTime);
   }
 
   async handleTokenTimeout() {
@@ -84,8 +84,8 @@ class Main extends Component {
     try {
       const res = await authService.getNewAccessToken(this.refreshToken);
       const token = res.data.access_token;
-      this.spotifyClient.setAccessToken(token);
       this.setState({ accessToken: token });
+      this.spotifyClient.setAccessToken(token);
     } catch (ex) {
       this.props.history.push({
         pathname: "/issue",

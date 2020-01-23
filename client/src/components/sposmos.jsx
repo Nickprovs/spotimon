@@ -7,6 +7,7 @@ import nBodyProblem from "../lib/simulation/nBodyProblem";
 import SimulationUtilities from "../lib/util/simulationUtilities";
 import ElementUtilities from "../lib/util/elementUtilities";
 import Slider from "./common/slider";
+import { withRouter } from "react-router-dom";
 
 const trailLength = 8;
 const g = 39.5;
@@ -14,7 +15,7 @@ let dt = 0.0005; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
 const scale = 70;
 
-export default class Sposmos extends Component {
+class Sposmos extends Component {
   state = {
     simulatorEnabled: false,
     simulationWidth: 0,
@@ -187,6 +188,15 @@ export default class Sposmos extends Component {
   }
 
   async handlePlayerStatusChange(state) {
+    console.log("Player Status", state);
+
+    if (state.error) {
+      this.props.history.push({
+        pathname: "/issue",
+        state: { issue: `Spotify player error - Type: ${state.errorType}, Error: ${state.error}` }
+      });
+    }
+
     const previouslyPlaying = this.state.playing;
     this.setState({ playing: state.isPlaying });
     // if (state.track && state.track.id != this.state.currentTrackData.id) {
@@ -405,3 +415,5 @@ export default class Sposmos extends Component {
     );
   }
 }
+
+export default withRouter(Sposmos);
