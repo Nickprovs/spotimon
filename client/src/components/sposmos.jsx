@@ -7,6 +7,7 @@ import nBodyProblem from "../lib/simulation/nBodyProblem";
 import SimulationUtilities from "../lib/util/simulationUtilities";
 import ElementUtilities from "../lib/util/elementUtilities";
 import Slider from "./common/slider";
+import Spinner from "./common/spinner";
 import { withRouter } from "react-router-dom";
 
 const trailLength = 8;
@@ -315,7 +316,8 @@ class Sposmos extends Component {
       canvasClickable,
       currentUris,
       currentTrackData,
-      playRequested
+      playRequested,
+      fetchingGenres
     } = this.state;
 
     const { accessToken } = this.props;
@@ -330,86 +332,96 @@ class Sposmos extends Component {
     console.log(playlistImageUrl);
 
     return (
-      <div className="simulator-container dashboard-text" ref={this.setPage} style={{ width: "100%", height: "100%" }}>
-        <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
-          <SpaceSimulator
-            simulationDriver={simulationDriver}
-            isEnabled={simulatorEnabled}
-            backgroundColor={"var(--s7)"}
-            width={simulatorWidth}
-            height={simulatorHeight}
-            cursor={simulationCursor}
-            onGravitationalObjectClick={async item => this.handleGenreClick(item)}
-            onGravitationalObjectMouseEnter={item => this.handleGenreMouseEnter(item)}
-            onGravitationalObjectMouseLeave={item => this.handleGenreMouseLeave(item)}
-          />
+      <div style={{ width: "100%", height: "100%" }}>
+        <div style={{ visibility: fetchingGenres ? "visible" : "hidden" }} className="spinner-container">
+          <Spinner />
         </div>
 
-        <div className="dashboard-area standard-text" ref={this.setHeader}>
-          {playRequested && (
-            <div className="dashboard-info-area playlist-section">
-              <div onClick={this.handlePlaylistClick.bind(this)} className="dashboard-section-left playlist-section">
-                <img style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
-                <div style={{ marginLeft: "4px" }}>
-                  <label style={{ cursor: "inherit" }}>Playlist</label>
-                  <br />
-                  <label style={{ cursor: "inherit" }}>{playlistName}</label>
+        <div
+          className="simulator-container dashboard-text"
+          style={{ width: "100%", height: "100%" }}
+          ref={this.setPage}
+        >
+          <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
+            <SpaceSimulator
+              simulationDriver={simulationDriver}
+              isEnabled={simulatorEnabled}
+              backgroundColor={"var(--s7)"}
+              width={simulatorWidth}
+              height={simulatorHeight}
+              cursor={simulationCursor}
+              onGravitationalObjectClick={async item => this.handleGenreClick(item)}
+              onGravitationalObjectMouseEnter={item => this.handleGenreMouseEnter(item)}
+              onGravitationalObjectMouseLeave={item => this.handleGenreMouseLeave(item)}
+            />
+          </div>
+
+          <div className="dashboard-area standard-text" ref={this.setHeader}>
+            {playRequested && (
+              <div className="dashboard-info-area playlist-section">
+                <div onClick={this.handlePlaylistClick.bind(this)} className="dashboard-section-left playlist-section">
+                  <img style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
+                  <div style={{ marginLeft: "4px" }}>
+                    <label style={{ cursor: "inherit" }}>Playlist</label>
+                    <br />
+                    <label style={{ cursor: "inherit" }}>{playlistName}</label>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Time Slider */}
-          <div className="dashboard-c1-area">
-            <div className="dashboard-section-center">
-              <label>Time</label>
-              <br />
-              <Slider
-                step={0.000001}
-                min={0.00001}
-                value={0.0005}
-                max={0.002}
-                onChange={this.handleDeltaTChange.bind(this)}
-                style={{ margin: "10px" }}
-              />
+            {/* Time Slider */}
+            <div className="dashboard-c1-area">
+              <div className="dashboard-section-center">
+                <label>Time</label>
+                <br />
+                <Slider
+                  step={0.000001}
+                  min={0.00001}
+                  value={0.0005}
+                  max={0.002}
+                  onChange={this.handleDeltaTChange.bind(this)}
+                  style={{ margin: "10px" }}
+                />
+              </div>
+            </div>
+
+            {/* Mass Slider */}
+            <div className="dashboard-c2-area">
+              <div className="dashboard-section-center">
+                <label>Mass</label>
+                <br />
+                <Slider
+                  step={0.1}
+                  min={0.1}
+                  value={1}
+                  max={3}
+                  onChange={this.handleMassChange.bind(this)}
+                  style={{ margin: "10px" }}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Mass Slider */}
-          <div className="dashboard-c2-area">
-            <div className="dashboard-section-center">
-              <label>Mass</label>
-              <br />
-              <Slider
-                step={0.1}
-                min={0.1}
-                value={1}
-                max={3}
-                onChange={this.handleMassChange.bind(this)}
-                style={{ margin: "10px" }}
-              />
-            </div>
+          <div ref={this.setFooter}>
+            <SpotifyPlayer
+              styles={{
+                loaderColor: "var(--f1)",
+                sliderHandleColor: "var(--f1)",
+                sliderTrackColor: "var(--b3)",
+                bgColor: "var(--b2)",
+                color: "var(--f1)",
+                trackNameColor: "var(--f1)",
+                trackArtistColor: "var(--f1)"
+              }}
+              showSaveIcon={true}
+              offset={playlistStartOffset}
+              callback={async state => this.handlePlayerStatusChange(state)}
+              play={playRequested}
+              uris={currentUris}
+              token={accessToken}
+            />
           </div>
-        </div>
-
-        <div ref={this.setFooter}>
-          <SpotifyPlayer
-            styles={{
-              loaderColor: "var(--f1)",
-              sliderHandleColor: "var(--f1)",
-              sliderTrackColor: "var(--b3)",
-              bgColor: "var(--b2)",
-              color: "var(--f1)",
-              trackNameColor: "var(--f1)",
-              trackArtistColor: "var(--f1)"
-            }}
-            showSaveIcon={true}
-            offset={playlistStartOffset}
-            callback={async state => this.handlePlayerStatusChange(state)}
-            play={playRequested}
-            uris={currentUris}
-            token={accessToken}
-          />
         </div>
       </div>
     );

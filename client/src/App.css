@@ -192,3 +192,9 @@ li:first-child {
 .playlist-section {
   cursor: pointer;
 }
+
+.spinner-container {
+  position: absolute;
+  bottom: calc(50% - 40px);
+  left: calc(50% - 40px);
+}
