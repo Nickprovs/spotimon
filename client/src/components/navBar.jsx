@@ -55,7 +55,7 @@ class NavBar extends Component {
             style={{ textDecoration: "none" }}
             className="nav-title"
           >
-            sposmos
+            spotimon
           </Link>
         </div>
         <div className="nav-btn">

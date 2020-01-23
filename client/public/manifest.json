@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Spotimon",
+  "name": "Visualize your musical taste.",
   "icons": [
     {
       "src": "favicon.ico",
