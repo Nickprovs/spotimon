@@ -179,6 +179,9 @@ class Sposmos extends Component {
     this.setState({ playlistStartOffset: playlistOffset });
     this.setState({ currentUris: [playlist.uri] });
     this.setState({ playRequested: true });
+
+    this.resetIsPlaying();
+    hitDetectedGravitationalObject.domain.isPlaying = true;
   }
 
   handleGenreMouseEnter(hitDetectedGravitationalObject) {
@@ -253,15 +256,24 @@ class Sposmos extends Component {
       timeCoeffecient = 0.4 * comparisonWithLast + 0.4 * comparisonWithRecentAverage + 0.2 * comparisonWithMaxLoudness;
     }
     this.state.simulationDriver.dt = 3 * dt * timeCoeffecient;
-    for (let i = 0; i < this.state.simulationDriver.masses.length - 1; i++) {
-      const mass = this.state.simulationDriver.masses[i];
+
+    const mass = this.state.simulationDriver.masses.filter(m => m.domain.isPlaying)[0];
+    if (mass) {
       if (!isNaN(timeCoeffecient)) {
         mass.manifestation.radius = mass.domain.basslineRadius + 1.0 * mass.domain.basslineRadius * timeCoeffecient;
       }
     }
+
     if (matchingSegmentForTime) {
       currentTrackData.recentLoudnessData.push(matchingSegmentForTime.loudness_start);
       if (currentTrackData.recentLoudnessData.count > averageRecentLength) currentTrackData.recentLoudnessData.pop();
+    }
+  }
+
+  resetIsPlaying() {
+    for (let i = 0; i < this.state.simulationDriver.masses.length - 1; i++) {
+      const mass = this.state.simulationDriver.masses[i];
+      mass.domain.isPlaying = false;
     }
   }
 

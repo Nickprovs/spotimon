@@ -8,6 +8,7 @@ export default class DomainInfo {
   }
 
   constructor(domainArgs) {
+    this.isPlaying = domainArgs.isPlaying ? domainArgs.isPlaying : false;
     this.genre = domainArgs.genre;
     this.basslineMass = DomainInfo.getDefaultBasslineMassFromGenreCount(this.genre.count);
     this.basslineRadius = DomainInfo.getDefaultBasslineRadiusFromGenreCount(this.genre.count);
