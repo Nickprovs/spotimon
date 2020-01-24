@@ -137,7 +137,8 @@ class Sposmos extends Component {
       const manifestationArgs = {
         defaultMass: defaultMass,
         trailLength: trailLength,
-        radius: DomainInfo.getDefaultBasslineRadiusFromGenreCount(genre.count)
+        radius: DomainInfo.getDefaultBasslineRadiusFromGenreCount(genre.count),
+        hasRing: Math.random() > 0.6
       };
 
       const spatialArgs = {
