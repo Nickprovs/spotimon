@@ -65,7 +65,7 @@ class Sposmos extends Component {
     };
 
     //The N-Body Problem object which embodies our simulator data and calculations
-    this.state.simulationDriver = new nBodyProblem({
+    this.simulationDriver = new nBodyProblem({
       g: g,
       dt: dt,
       masses: [],
@@ -159,7 +159,7 @@ class Sposmos extends Component {
       };
 
       let mass = new NBodyItem(spatialArgs, manifestationArgs, domainArgs);
-      this.state.simulationDriver.masses.push(mass);
+      this.simulationDriver.masses.push(mass);
     }
     this.setState({ simulatorEnabled: true });
   }
@@ -264,9 +264,9 @@ class Sposmos extends Component {
 
       timeCoeffecient = 0.4 * comparisonWithLast + 0.4 * comparisonWithRecentAverage + 0.2 * comparisonWithMaxLoudness;
     }
-    this.state.simulationDriver.dt = 3 * dt * timeCoeffecient;
+    this.simulationDriver.dt = 3 * dt * timeCoeffecient;
 
-    const mass = this.state.simulationDriver.masses.filter(m => m.domain.isPlaying)[0];
+    const mass = this.simulationDriver.masses.filter(m => m.domain.isPlaying)[0];
     if (mass) {
       if (!isNaN(timeCoeffecient)) {
         mass.manifestation.radius = mass.domain.basslineRadius + 1.0 * mass.domain.basslineRadius * timeCoeffecient;
@@ -280,8 +280,8 @@ class Sposmos extends Component {
   }
 
   resetIsPlaying() {
-    for (let i = 0; i < this.state.simulationDriver.masses.length - 1; i++) {
-      const mass = this.state.simulationDriver.masses[i];
+    for (let i = 0; i < this.simulationDriver.masses.length - 1; i++) {
+      const mass = this.simulationDriver.masses[i];
       mass.domain.isPlaying = false;
     }
   }
@@ -296,12 +296,12 @@ class Sposmos extends Component {
 
   handleDeltaTChange(newDt) {
     dt = newDt;
-    this.state.simulationDriver.dt = newDt;
+    this.simulationDriver.dt = newDt;
   }
   handleMassChange(factor) {
     console.log("hi");
-    for (let i = 0; i < this.state.simulationDriver.masses.length - 1; i++) {
-      const mass = this.state.simulationDriver.masses[i];
+    for (let i = 0; i < this.simulationDriver.masses.length - 1; i++) {
+      const mass = this.simulationDriver.masses[i];
       const defaultBassLineMass = DomainInfo.getDefaultBasslineMassFromGenreCount(mass.domain.genre.count);
       const defaultBassLineRadius = DomainInfo.getDefaultBasslineRadiusFromGenreCount(mass.domain.genre.count);
       const newBasslineMass = defaultBassLineMass * factor;
@@ -330,7 +330,6 @@ class Sposmos extends Component {
   render() {
     const {
       simulationCursor,
-      simulationDriver,
       simulatorEnabled,
       simulatorWidth,
       simulatorHeight,
@@ -367,7 +366,7 @@ class Sposmos extends Component {
         >
           <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
             <SpaceSimulator
-              simulationDriver={simulationDriver}
+              simulationDriver={this.simulationDriver}
               isEnabled={simulatorEnabled}
               backgroundColor={"var(--s7)"}
               width={simulatorWidth}
@@ -383,7 +382,13 @@ class Sposmos extends Component {
             {playing && (
               <div className="dashboard-info-area playlist-section">
                 <div onClick={this.handlePlaylistClick.bind(this)} className="dashboard-section-left playlist-section">
-                  <img style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
+                  <img
+                    alt="playlist"
+                    style={{ backgroundGolor: "green" }}
+                    width="40"
+                    height="40"
+                    src={playlistImageUrl}
+                  />
                   <div style={{ marginLeft: "4px" }}>
                     <label style={{ cursor: "inherit" }}>Playlist</label>
                     <br />
