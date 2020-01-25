@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import NBodyItem from "../lib/simulation/nBodyItem";
 import DomainInfo from "../lib/simulation/info/domainInfo";
 import SpotifyPlayer from "react-spotify-web-playback";
 import SpaceSimulator from "./common/spaceSimulator";
@@ -10,7 +9,6 @@ import Slider from "./common/slider";
 import Spinner from "./common/spinner";
 import { withRouter } from "react-router-dom";
 
-const trailLength = 8;
 const g = 39.5;
 let dt = 0.0005; //0.005 years is equal to 1.825 days
 const softeningConstant = 0.15;
@@ -40,9 +38,8 @@ class Sposmos extends Component {
     super();
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
-
-    this.durationCheckTimerId = null;
     this.onDurationCheck = this.onDurationCheck.bind(this);
+    this.durationCheckTimerId = null;
 
     this.page = null;
     this.setPage = element => {
@@ -128,39 +125,16 @@ class Sposmos extends Component {
       uniqueGenreData = spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
     } catch (ex) {
       console.log(ex);
+      this.props.history.push({
+        pathname: "/issue",
+        state: { issueHeader: `You must have at least 20 liked / saved songs to continue.`, issueBody: ex }
+      });
+      return;
     } finally {
       this.setState({ fetchingGenres: false });
     }
 
-    const genresToUseCount = Math.min(25, uniqueGenreData.length);
-    const quarterSize = genresToUseCount.length / 4;
-    const threeQuarterMark = 3 * (quarterSize - 1);
-    const frequentedGenres = uniqueGenreData.slice(0, threeQuarterMark);
-    const unfrequentedGenres = uniqueGenreData.slice(threeQuarterMark, genresToUseCount - 1);
-    const genres = frequentedGenres.concat(unfrequentedGenres);
-
-    for (let genre of genres) {
-      const defaultMass = DomainInfo.getDefaultBasslineMassFromGenreCount(genre.count);
-
-      const manifestationArgs = {
-        defaultMass: defaultMass,
-        trailLength: trailLength,
-        radius: DomainInfo.getDefaultBasslineRadiusFromGenreCount(genre.count),
-        hasRing: Math.random() > 0.6
-      };
-
-      const spatialArgs = {
-        m: defaultMass,
-        ...SimulationUtilities.getRandomGravitationalObjectData()
-      };
-
-      const domainArgs = {
-        genre: genre
-      };
-
-      let mass = new NBodyItem(spatialArgs, manifestationArgs, domainArgs);
-      this.simulationDriver.masses.push(mass);
-    }
+    this.simulationDriver.masses = SimulationUtilities.geNBodyItemsFromUniqueGenreData(uniqueGenreData, 8);
     this.setState({ simulatorEnabled: true });
   }
 
@@ -326,7 +300,6 @@ class Sposmos extends Component {
     window.open(playlistWebPlayerUrl, "_newtab");
   }
 
-  //test
   render() {
     const {
       simulationCursor,

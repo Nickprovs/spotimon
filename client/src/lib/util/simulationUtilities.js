@@ -1,3 +1,6 @@
+import DomainInfo from "../simulation/info/domainInfo";
+import NBodyItem from "../simulation/nBodyItem";
+
 export default class SimulationUtilities {
   static getRandomGravitationalObjectData() {
     const isNegativeX = Math.random() > 0.5;
@@ -31,5 +34,41 @@ export default class SimulationUtilities {
     if (isNegativeAy) ay *= -1;
 
     return { x, y, z, vx, vy, vz, ax, ay, az };
+  }
+
+  static geNBodyItemsFromUniqueGenreData(uniqueGenreData, trailLength = 8) {
+    const genresToUseCount = Math.min(25, uniqueGenreData.length);
+    const quarterSize = genresToUseCount.length / 4;
+    const threeQuarterMark = 3 * (quarterSize - 1);
+    const frequentedGenres = uniqueGenreData.slice(0, threeQuarterMark);
+    const unfrequentedGenres = uniqueGenreData.slice(threeQuarterMark, genresToUseCount - 1);
+    const genres = frequentedGenres.concat(unfrequentedGenres);
+
+    let nBodyItems = [];
+
+    for (let genre of genres) {
+      const defaultMass = DomainInfo.getDefaultBasslineMassFromGenreCount(genre.count);
+
+      const manifestationArgs = {
+        defaultMass: defaultMass,
+        trailLength: trailLength,
+        radius: DomainInfo.getDefaultBasslineRadiusFromGenreCount(genre.count),
+        hasRing: Math.random() > 0.6
+      };
+
+      const spatialArgs = {
+        m: defaultMass,
+        ...SimulationUtilities.getRandomGravitationalObjectData()
+      };
+
+      const domainArgs = {
+        genre: genre
+      };
+
+      const item = new NBodyItem(spatialArgs, manifestationArgs, domainArgs);
+      nBodyItems.push(item);
+    }
+
+    return nBodyItems;
   }
 }
