@@ -4,10 +4,6 @@ import Main from "./components/main";
 import "./App.css";
 
 class App extends Component {
-  constructor() {
-    super();
-  }
-
   render() {
     return (
       <BrowserRouter>

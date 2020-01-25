@@ -39,7 +39,7 @@ class Main extends Component {
 
   redirectIfOnInvalidPageForState() {
     console.log("mounted at", this.props.location.pathname);
-    if (this.props.location.pathname == "/simulation" && !this.state.accessToken)
+    if (this.props.location.pathname === "/simulation" && !this.state.accessToken)
       this.props.history.push({ pathname: "/begin" });
   }
 
@@ -71,7 +71,7 @@ class Main extends Component {
       return;
     }
 
-    if (userProfile.product != "premium") {
+    if (userProfile.product !== "premium") {
       this.props.history.push({
         pathname: "/issue",
         state: {
