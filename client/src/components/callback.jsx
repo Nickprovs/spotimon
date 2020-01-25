@@ -4,7 +4,13 @@ import UrlUtilities from "../lib/util/urlUtilities";
 class Callback extends Component {
   state = {};
   render() {
-    return <h1>Callback</h1>;
+    return (
+      <div style={{ margin: "10px" }} className="center-wrapper">
+        <h1>Callback</h1>
+        <br />
+        <h1>Preparing to redirect...</h1>
+      </div>
+    );
   }
 
   componentDidMount() {
