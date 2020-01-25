@@ -1,5 +1,6 @@
 export default class ManifestationInfo {
-  constructor(manifestationArgs) {
+  constructor(manifestationArgs, domainInfo) {
+    this.domain = domainInfo;
     this.trailLength = manifestationArgs.trailLength;
     this.radius = manifestationArgs.radius;
     this.hasRing = manifestationArgs.hasRing;
@@ -40,13 +41,26 @@ export default class ManifestationInfo {
       }
 
       const { r, g, b } = this.primaryColor;
-      canvasContext.beginPath();
-      canvasContext.arc(this.positions[i].x, this.positions[i].y, circleScaleFactor * this.radius, 0, 2 * Math.PI);
-      canvasContext.fillStyle = `rgb(${r}, ${g}, ${b}, ${transparency})`;
-      canvasContext.fill();
 
       //Special Operations for the main circle
       if (i === positionsLen - 1) {
+        if (this.domain.isPlaying) {
+          canvasContext.beginPath();
+          canvasContext.arc(this.positions[i].x, this.positions[i].y, this.radius + this.radius * 1, 0, 2 * Math.PI);
+          canvasContext.fillStyle = `rgb(255, 250, 33, 0.1)`;
+          canvasContext.fill();
+
+          canvasContext.beginPath();
+          canvasContext.arc(this.positions[i].x, this.positions[i].y, this.radius + this.radius * 0.7, 0, 2 * Math.PI);
+          canvasContext.fillStyle = `rgb(255, 250, 33, 0.1)`;
+          canvasContext.fill();
+
+          canvasContext.beginPath();
+          canvasContext.arc(this.positions[i].x, this.positions[i].y, this.radius + this.radius * 0.4, 0, 2 * Math.PI);
+          canvasContext.fillStyle = `rgb(255, 250, 33, 0.1)`;
+          canvasContext.fill();
+        }
+
         if (this.hasRing) {
           canvasContext.beginPath();
           canvasContext.arc(
@@ -60,6 +74,11 @@ export default class ManifestationInfo {
           canvasContext.lineWidth = 2;
           canvasContext.stroke();
         }
+
+        canvasContext.beginPath();
+        canvasContext.arc(this.positions[i].x, this.positions[i].y, circleScaleFactor * this.radius, 0, 2 * Math.PI);
+        canvasContext.fillStyle = `rgb(${r}, ${g}, ${b}, ${transparency})`;
+        canvasContext.fill();
       }
     }
   }
