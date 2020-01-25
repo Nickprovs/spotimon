@@ -86,17 +86,18 @@ class Sposmos extends Component {
     });
   }
 
-  handleWindowResize() {
-    //TODO: No matter the case, we shouldn't be displaying scroll bars. Use a css class to prevent that.
-    this.setSimulatorSize();
-  }
-
   async componentDidMount() {
+    //If we're not authenticated by now... the main component will redirect us...
+    if (!this.props.accessToken) return;
+
     this.setSimulatorSize();
     window.addEventListener("resize", this.handleWindowResize);
-    console.log("footer", this.footer);
     new ResizeObserver(this.handleWindowResize).observe(this.footer);
     await this.fetchGenres();
+  }
+
+  handleWindowResize() {
+    this.setSimulatorSize();
   }
 
   componentWillUnmount() {
@@ -116,6 +117,13 @@ class Sposmos extends Component {
     this.setState({ fetchingGenres: true });
     try {
       const savedTracks = await spotifyClient.getSavedTracksAsync(300);
+      if (savedTracks.length < 20) {
+        this.props.history.push({
+          pathname: "/issue",
+          state: { issueHeader: `You must have at least 20 liked / saved songs to continue.` }
+        });
+      }
+
       const savedArtists = await spotifyClient.getArtistsFromTracksAsync(savedTracks);
       uniqueGenreData = spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
     } catch (ex) {

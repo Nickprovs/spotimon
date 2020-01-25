@@ -71,16 +71,16 @@ class Main extends Component {
       return;
     }
 
-    if (userProfile.product != "premium") {
-      this.props.history.push({
-        pathname: "/issue",
-        state: {
-          issueHeader: "Spotify premium is required for this app.",
-          issueBody: " Sign out of the current non-premium account through spotify if you have a premium account."
-        }
-      });
-      return;
-    }
+    // if (userProfile.product != "premium") {
+    //   this.props.history.push({
+    //     pathname: "/issue",
+    //     state: {
+    //       issueHeader: "Spotify premium is required for this app.",
+    //       issueBody: " Sign out of the current non-premium account through spotify if you have a premium account."
+    //     }
+    //   });
+    //   return;
+    // }
 
     this.setState({ accessToken: urlParams.access_token });
     this.refreshToken = urlParams.refresh_token;

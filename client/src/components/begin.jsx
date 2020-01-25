@@ -18,9 +18,9 @@ class Begin extends Component {
             width="100%"
             height="100%"
             id="preview"
-            muted="true"
-            preload="true"
-            autoPlay="true"
+            muted={true}
+            preload="auto"
+            autoPlay={true}
             loop="loop"
             style={{ objectFit: "cover" }}
           >
