@@ -194,6 +194,7 @@ class Sposmos extends Component {
 
   async handlePlayerStatusChange(state) {
     console.log("Player Status", state);
+    console.log("current traxk data", this.state.currentTrackData);
 
     if (state.error) {
       this.props.history.push({
@@ -330,6 +331,7 @@ class Sposmos extends Component {
       currentUris,
       currentTrackData,
       playRequested,
+      playing,
       fetchingGenres
     } = this.state;
 
@@ -370,7 +372,7 @@ class Sposmos extends Component {
           </div>
 
           <div className="dashboard-area standard-text" ref={this.setHeader}>
-            {playRequested && (
+            {playing && (
               <div className="dashboard-info-area playlist-section">
                 <div onClick={this.handlePlaylistClick.bind(this)} className="dashboard-section-left playlist-section">
                   <img style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
