@@ -198,7 +198,7 @@ class Sposmos extends Component {
     if (state.error) {
       this.props.history.push({
         pathname: "/issue",
-        state: { issue: `Spotify player error - Type: ${state.errorType}, Error: ${state.error}` }
+        state: { issueHeader: `Spotify player error - Type: ${state.errorType}, Error: ${state.error}` }
       });
     }
 

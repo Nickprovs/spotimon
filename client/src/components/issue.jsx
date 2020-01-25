@@ -1,12 +1,17 @@
 import React from "react";
 
 const Issue = ({ history }) => {
-  let issue = "Issue";
-  if (history.location.state && history.location.state.issue) issue = history.location.state.issue;
+  let issueHeader = "Issue";
+  let issueBody = "";
+
+  if (history.location.state && history.location.state.issueHeader) issueHeader = history.location.state.issueHeader;
+  if (history.location.state && history.location.state.issueBody) issueBody = history.location.state.issueBody;
 
   return (
-    <div className="center-wrapper">
-      <h1 className="standard-text">{issue}</h1>
+    <div style={{ margin: "10px" }} className="center-wrapper">
+      <h1 className="standard-text">{issueHeader}</h1>
+      <br />
+      <h1 className="standard-text">{issueBody}</h1>
     </div>
   );
 };

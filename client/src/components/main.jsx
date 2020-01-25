@@ -51,7 +51,10 @@ class Main extends Component {
 
   async handleCallback(urlParams) {
     if (!urlParams.access_token || !urlParams.refresh_token)
-      this.props.history.push({ pathname: "/issue", state: { issue: "Data was not passed from spotify callback." } });
+      this.props.history.push({
+        pathname: "/issue",
+        state: { issueHeader: "Data was not passed from spotify callback." }
+      });
 
     this.spotifyClient.setAccessToken(urlParams.access_token);
 
@@ -59,17 +62,23 @@ class Main extends Component {
     try {
       userProfile = await this.spotifyClient.getMe();
     } catch (ex) {
-      this.props.history.push({ pathname: "/issue", state: { issue: "Could not retrieve user profile." } });
+      this.props.history.push({ pathname: "/issue", state: { issueHeader: "Could not retrieve user profile." } });
       return;
     }
 
     if (!userProfile) {
-      this.props.history.push({ pathname: "/issue", state: { issue: "Could not retrieve user profile." } });
+      this.props.history.push({ pathname: "/issue", state: { issueHeader: "Could not retrieve user profile." } });
       return;
     }
 
     if (userProfile.product != "premium") {
-      this.props.history.push({ pathname: "/issue", state: { issue: "Spotify premium is required for this app." } });
+      this.props.history.push({
+        pathname: "/issue",
+        state: {
+          issueHeader: "Spotify premium is required for this app.",
+          issueBody: " Sign out of the current non-premium account through spotify if you have a premium account."
+        }
+      });
       return;
     }
 
@@ -89,7 +98,9 @@ class Main extends Component {
     } catch (ex) {
       this.props.history.push({
         pathname: "/issue",
-        state: { issue: "Couldn't refresh spotify authentication. Please navigate to the home page and try again." }
+        state: {
+          issueHeader: "Couldn't refresh spotify authentication. Please navigate to the home page and try again."
+        }
       });
       return;
     }
