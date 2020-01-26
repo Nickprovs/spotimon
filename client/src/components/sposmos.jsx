@@ -5,6 +5,7 @@ import SpaceSimulator from "./common/spaceSimulator";
 import nBodyProblem from "../lib/simulation/nBodyProblem";
 import SimulationUtilities from "../lib/util/simulationUtilities";
 import ElementUtilities from "../lib/util/elementUtilities";
+import AudioAnalysisUtilities from "../lib/util/audioAnalysisUtilities";
 import Slider from "./common/slider";
 import Spinner from "./common/spinner";
 import { withRouter } from "react-router-dom";
@@ -215,45 +216,44 @@ class Sposmos extends Component {
     currentTrackData.progressInSeconds += 0.2;
     this.setState({ currentTrackData });
 
-    const maxLoudness = currentTrackData.analysis.track.loudness;
-
+    //Get the audio analysis segment for the current timestamp (progress in seconds)
     let matchingSegmentForTime = currentTrackData.analysis.segments.filter(
       s => s.start <= currentTrackData.progressInSeconds && s.start + s.duration > currentTrackData.progressInSeconds
     )[0];
 
-    const averageRecentLength = 6;
+    //If we failed to get a current audio analysis segment... we can't do much here
+    if (!matchingSegmentForTime) return;
 
-    let timeCoeffecient = 1;
-    if (matchingSegmentForTime && currentTrackData.recentLoudnessData.length >= averageRecentLength) {
-      let averageRecent =
-        currentTrackData.recentLoudnessData.reduce((a, b) => a + b, 0) / currentTrackData.recentLoudnessData.length;
-      let comparisonWithRecentAverage = Math.abs(matchingSegmentForTime.loudness_start / averageRecent);
+    let weightedVolumeAverage = 1;
+    const maxLoudness = currentTrackData.analysis.track.loudness;
+    const idealRecentSampleCount = 6;
 
-      let comparisonWithLast = Math.abs(
-        matchingSegmentForTime.loudness_start /
-          currentTrackData.recentLoudnessData[currentTrackData.recentLoudnessData.length - 1]
+    //If we have enough recent loudness samples to compare to the current sample
+    if (currentTrackData.recentLoudnessData.length >= idealRecentSampleCount) {
+      weightedVolumeAverage = AudioAnalysisUtilities.getWeightedVolumeAverageForSegment(
+        matchingSegmentForTime,
+        currentTrackData.recentLoudnessData,
+        maxLoudness
       );
-
-      let comparisonWithMaxLoudness = Math.pow(Math.abs(maxLoudness / matchingSegmentForTime.loudness_start), 1.7);
-
-      timeCoeffecient = 0.4 * comparisonWithLast + 0.4 * comparisonWithRecentAverage + 0.2 * comparisonWithMaxLoudness;
     }
-    this.simulationDriver.dt = 3 * dt * timeCoeffecient;
 
+    //Modify the mass and time based on the weighted volume average for the current sample
+    this.simulationDriver.dt = 3 * dt * weightedVolumeAverage;
     const mass = this.simulationDriver.masses.filter(m => m.domain.isPlaying)[0];
     if (mass) {
-      if (!isNaN(timeCoeffecient)) {
-        mass.manifestation.radius = mass.domain.basslineRadius + 1.0 * mass.domain.basslineRadius * timeCoeffecient;
+      if (!isNaN(weightedVolumeAverage)) {
+        mass.manifestation.radius =
+          mass.domain.basslineRadius + 1.0 * mass.domain.basslineRadius * weightedVolumeAverage;
       }
     }
 
-    if (matchingSegmentForTime) {
-      currentTrackData.recentLoudnessData.push(matchingSegmentForTime.loudness_start);
-      if (currentTrackData.recentLoudnessData.count > averageRecentLength) currentTrackData.recentLoudnessData.pop();
-    }
+    //Push the current loudness sample on the set of recent samples and pop the oldest if we're full.
+    currentTrackData.recentLoudnessData.push(matchingSegmentForTime.loudness_start);
+    if (currentTrackData.recentLoudnessData.count > idealRecentSampleCount) currentTrackData.recentLoudnessData.pop();
   }
 
   resetIsPlaying() {
+    //Reset's each space item's isPlaying flag contained in its domain-specific info
     for (let i = 0; i < this.simulationDriver.masses.length - 1; i++) {
       const mass = this.simulationDriver.masses[i];
       mass.domain.isPlaying = false;
@@ -262,28 +262,35 @@ class Sposmos extends Component {
 
   async updateNewTrackData(trackId) {
     const { spotifyClient } = this.props;
-
-    const res = await spotifyClient.getAudioAnalysisForTrack(trackId);
-    const currentTrackData = { ...this.state.currentTrackData, id: trackId, analysis: res, progressInSeconds: 0 };
-    this.setState({ currentTrackData });
+    try {
+      const res = await spotifyClient.getAudioAnalysisForTrack(trackId);
+      const currentTrackData = { ...this.state.currentTrackData, id: trackId, analysis: res, progressInSeconds: 0 };
+      this.setState({ currentTrackData });
+    } catch (ex) {
+      console.log("Issue grabbing track data", ex);
+      return;
+    }
   }
 
   handleDeltaTChange(newDt) {
     dt = newDt;
+    //Updating the simulator driver's dt will affect it's calculations while animating each frame
     this.simulationDriver.dt = newDt;
   }
+
   handleMassChange(factor) {
-    console.log("hi");
     for (let i = 0; i < this.simulationDriver.masses.length - 1; i++) {
       const mass = this.simulationDriver.masses[i];
+
+      //Calculate a new bassline data based off the default data and the slider value
       const defaultBassLineMass = DomainInfo.getDefaultBasslineMassFromGenreCount(mass.domain.genre.count);
       const defaultBassLineRadius = DomainInfo.getDefaultBasslineRadiusFromGenreCount(mass.domain.genre.count);
       const newBasslineMass = defaultBassLineMass * factor;
       const newBasslineRadius = defaultBassLineRadius * factor;
 
+      //Set both the bassline data and current data.
       mass.domain.basslineMass = newBasslineMass;
       mass.domain.basslineRadius = newBasslineRadius;
-
       mass.spatial.m = newBasslineMass;
       mass.manifestation.radius = newBasslineRadius;
     }
@@ -291,12 +298,14 @@ class Sposmos extends Component {
 
   handlePlaylistClick() {
     const { currentTrackData } = this.state;
+
+    //Try to parse a navigatable playlist. Do nothing if we can't
     let playlistWebPlayerUrl = "";
     if (currentTrackData.playlist && currentTrackData.playlist.external_urls)
       playlistWebPlayerUrl = currentTrackData.playlist.external_urls.spotify;
-
     if (!playlistWebPlayerUrl) return;
 
+    //Open the playlist in a specific tab
     window.open(playlistWebPlayerUrl, "_newtab");
   }
 
