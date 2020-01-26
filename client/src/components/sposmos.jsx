@@ -146,15 +146,12 @@ class Sposmos extends Component {
     const playlists = await spotifyClient.searchPlaylists(`the sound of ${genreName}`);
     const playlist = playlists.playlists.items[0];
     console.log(playlist);
-    const playlistOffset = Math.min(
-      Math.floor(Math.random() * 100),
-      Math.floor(Math.random() * playlist.tracks.total - 1)
-    );
+    const playlistOffset = Math.min(Math.floor(Math.random() * 100), Math.floor(Math.random() * playlist.tracks.total - 1));
 
     const res = await spotifyClient.getPlaylistTracks(playlist.id, { offset: playlistOffset });
     const song = res.items[0].track;
     console.log("playlist song", song);
-    await this.updateNewTrackData(song.id);
+    await this.updateNewTrackDataAsync(song.id);
 
     let currentTrackData = { ...this.state.currentTrackData };
     currentTrackData.playlist = playlist;
@@ -189,7 +186,7 @@ class Sposmos extends Component {
     const previouslyPlaying = this.state.playing;
     this.setState({ playing: state.isPlaying });
     // if (state.track && state.track.id != this.state.currentTrackData.id) {
-    //   await this.updateNewTrackData(state.track);
+    //   await this.updateNewTrackDataAsync(state.track);
     // }
 
     if (state.isPlaying) {
@@ -216,25 +213,28 @@ class Sposmos extends Component {
     currentTrackData.progressInSeconds += 0.2;
     this.setState({ currentTrackData });
 
+    this.updateAudioAnalysisVisualizationEffects();
+  }
+
+  updateAudioAnalysisVisualizationEffects() {
+    const currentTrackData = { ...this.state.currentTrackData };
+
     //Get the audio analysis segment for the current timestamp (progress in seconds)
-    let matchingSegmentForTime = currentTrackData.analysis.segments.filter(
+    let currentSegment = currentTrackData.analysis.segments.filter(
       s => s.start <= currentTrackData.progressInSeconds && s.start + s.duration > currentTrackData.progressInSeconds
     )[0];
 
     //If we failed to get a current audio analysis segment... we can't do much here
-    if (!matchingSegmentForTime) return;
+    if (!currentSegment) return;
 
     let weightedVolumeAverage = 1;
     const maxLoudness = currentTrackData.analysis.track.loudness;
     const idealRecentSampleCount = 6;
+    const recentSegments = currentTrackData.recentLoudnessData;
 
     //If we have enough recent loudness samples to compare to the current sample
-    if (currentTrackData.recentLoudnessData.length >= idealRecentSampleCount) {
-      weightedVolumeAverage = AudioAnalysisUtilities.getWeightedVolumeAverageForSegment(
-        matchingSegmentForTime,
-        currentTrackData.recentLoudnessData,
-        maxLoudness
-      );
+    if (recentSegments.length >= idealRecentSampleCount) {
+      weightedVolumeAverage = AudioAnalysisUtilities.getWeightedVolumeAverageForSegment(currentSegment, recentSegments, maxLoudness);
     }
 
     //Modify the mass and time based on the weighted volume average for the current sample
@@ -242,14 +242,13 @@ class Sposmos extends Component {
     const mass = this.simulationDriver.masses.filter(m => m.domain.isPlaying)[0];
     if (mass) {
       if (!isNaN(weightedVolumeAverage)) {
-        mass.manifestation.radius =
-          mass.domain.basslineRadius + 1.0 * mass.domain.basslineRadius * weightedVolumeAverage;
+        mass.manifestation.radius = mass.domain.basslineRadius + 1.0 * mass.domain.basslineRadius * weightedVolumeAverage;
       }
     }
 
     //Push the current loudness sample on the set of recent samples and pop the oldest if we're full.
-    currentTrackData.recentLoudnessData.push(matchingSegmentForTime.loudness_start);
-    if (currentTrackData.recentLoudnessData.count > idealRecentSampleCount) currentTrackData.recentLoudnessData.pop();
+    recentSegments.push(currentSegment.loudness_start);
+    if (recentSegments.count > idealRecentSampleCount) recentSegments.pop();
   }
 
   resetIsPlaying() {
@@ -260,7 +259,7 @@ class Sposmos extends Component {
     }
   }
 
-  async updateNewTrackData(trackId) {
+  async updateNewTrackDataAsync(trackId) {
     const { spotifyClient } = this.props;
     try {
       const res = await spotifyClient.getAudioAnalysisForTrack(trackId);
@@ -327,8 +326,7 @@ class Sposmos extends Component {
     const { accessToken } = this.props;
 
     let playlistImageUrl = "";
-    if (currentTrackData.playlist && currentTrackData.playlist.images)
-      playlistImageUrl = currentTrackData.playlist.images[0].url;
+    if (currentTrackData.playlist && currentTrackData.playlist.images) playlistImageUrl = currentTrackData.playlist.images[0].url;
 
     let playlistName = "";
     if (currentTrackData.playlist) playlistName = currentTrackData.playlist.name;
@@ -341,11 +339,7 @@ class Sposmos extends Component {
           <Spinner />
         </div>
 
-        <div
-          className="simulator-container dashboard-text"
-          style={{ width: "100%", height: "100%" }}
-          ref={this.setPage}
-        >
+        <div className="simulator-container dashboard-text" style={{ width: "100%", height: "100%" }} ref={this.setPage}>
           <div style={{ cursor: canvasClickable ? "pointer" : "default" }}>
             <SpaceSimulator
               simulationDriver={this.simulationDriver}
@@ -364,13 +358,7 @@ class Sposmos extends Component {
             {playing && (
               <div className="dashboard-info-area playlist-section">
                 <div onClick={this.handlePlaylistClick.bind(this)} className="dashboard-section-left playlist-section">
-                  <img
-                    alt="playlist"
-                    style={{ backgroundGolor: "green" }}
-                    width="40"
-                    height="40"
-                    src={playlistImageUrl}
-                  />
+                  <img alt="playlist" style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
                   <div style={{ marginLeft: "4px" }}>
                     <label style={{ cursor: "inherit" }}>Playlist</label>
                     <br />
@@ -401,14 +389,7 @@ class Sposmos extends Component {
               <div className="dashboard-section-center">
                 <label>Mass</label>
                 <br />
-                <Slider
-                  step={0.1}
-                  min={0.1}
-                  value={1}
-                  max={3}
-                  onChange={this.handleMassChange.bind(this)}
-                  style={{ margin: "10px" }}
-                />
+                <Slider step={0.1} min={0.1} value={1} max={3} onChange={this.handleMassChange.bind(this)} style={{ margin: "10px" }} />
               </div>
             </div>
           </div>
