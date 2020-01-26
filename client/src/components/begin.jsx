@@ -52,7 +52,7 @@ const Begin = () => {
             </ul> */}
       <div className="enter-area">
         <div className="enter-button-container">
-          <a href="http://localhost:8888/login">
+          <a href="http://localhost:8888/api/auth/login">
             <StandardButton>Login With Spotify</StandardButton>
           </a>
         </div>
