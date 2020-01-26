@@ -44,11 +44,7 @@ class SpaceSimulator extends Component {
       if (massI.domain.genre.name) {
         this.canvasContext.fillStyle = "white";
         this.canvasContext.font = "16px Arial";
-        this.canvasContext.fillText(
-          massI.domain.genre.name,
-          x + massI.manifestation.radius + 2,
-          y - massI.manifestation.radius - 2
-        );
+        this.canvasContext.fillText(massI.domain.genre.name, x + massI.manifestation.radius + 2, y - massI.manifestation.radius - 2);
       }
 
       const edgeX = width / 2 / simulationDriver.scale;
@@ -150,16 +146,8 @@ class SpaceSimulator extends Component {
         const massPosition = massI.manifestation.positions[i];
         const scaleFactor = i / massI.manifestation.positions.length;
 
-        if (
-          MathUtilities.isPointWithinCircle(
-            mouseX,
-            mouseY,
-            massPosition.x,
-            massPosition.y,
-            massI.manifestation.radius * scaleFactor
-          )
-        ) {
-          console.log("clicked", massI.name);
+        if (MathUtilities.isPointWithinCircle(mouseX, mouseY, massPosition.x, massPosition.y, massI.manifestation.radius * scaleFactor)) {
+          console.log("clicked", massI);
           hitDectectionSuccessful = true;
           hitDetectedMass = massI;
           break;

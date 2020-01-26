@@ -125,7 +125,7 @@ class Sposmos extends Component {
       const savedArtists = await spotifyClient.getArtistsFromTracksAsync(savedTracks);
       uniqueGenreData = spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
     } catch (ex) {
-      console.log(ex);
+      console.error(ex);
       this.props.history.push({
         pathname: "/issue",
         state: { issueHeader: `You must have at least 20 liked / saved songs to continue.`, issueBody: ex }
@@ -185,16 +185,25 @@ class Sposmos extends Component {
     this.setState({ playing: state.isPlaying });
 
     let trackDataRetrievalDelay = 0;
+
+    //Get the latest track data if we've changed
     if (this.state.currentTrackData.id != state.track.id) {
       const startDate = new Date();
-      await this.updateCurrentTrackDataFromIdAsync(state.track.id);
+      try {
+        await this.updateCurrentTrackDataFromIdAsync(state.track.id);
+      } catch (ex) {
+        console.error(ex);
+      }
       const endDate = new Date();
       trackDataRetrievalDelay = (endDate.getTime() - startDate.getTime()) / 100;
     }
 
-    //If we're playing... update the state with the current track data
+    //If we're playing... set the current position in the track
     if (state.isPlaying) {
       this.setState({ currentTrackData: { ...this.state.currentTrackData, progressInSeconds: state.position + trackDataRetrievalDelay } });
+
+      //If we're playing but were not previously... we need to start the check in timer.
+      if (!previouslyPlaying) this.checkInTimerId = setInterval(this.onCurrentlyPlayingCheckIn, 200);
     }
 
     //If we're not playing... clear any potential timer's we had and update the state
@@ -202,16 +211,9 @@ class Sposmos extends Component {
       clearInterval(this.checkInTimerId);
       this.setState({ playRequested: false });
     }
-
-    //If we're playing but were not previously... we need to start the check in timer.
-    if (state.isPlaying && !previouslyPlaying) {
-      console.log("setting interval");
-      this.checkInTimerId = setInterval(this.onCurrentlyPlayingCheckIn, 200);
-    }
   }
 
   async updateCurrentTrackDataFromIdAsync(trackId) {
-    console.log("updating track data");
     const { spotifyClient } = this.props;
 
     try {
@@ -232,7 +234,7 @@ class Sposmos extends Component {
       };
       this.setState({ currentTrackData });
     } catch (ex) {
-      console.log("Issue grabbing track data", ex);
+      console.error("Issue grabbing track data", ex);
       return;
     }
   }
@@ -373,7 +375,7 @@ class Sposmos extends Component {
           </div>
 
           <div className="dashboard-area standard-text" ref={this.setHeader}>
-            {playing && (
+            {playing && currentTrackData.playlist && (
               <div className="dashboard-info-area playlist-section">
                 <div onClick={this.handlePlaylistClick.bind(this)} className="dashboard-section-left playlist-section">
                   <img alt="playlist" style={{ backgroundGolor: "green" }} width="40" height="40" src={playlistImageUrl} />
