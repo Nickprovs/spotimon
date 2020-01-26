@@ -25,7 +25,6 @@ class SpotifyClient extends Spotify {
 
   async getArtistsFromTracksAsync(tracks) {
     let artists = [];
-
     try {
       for (let track of tracks) {
         const res = await this.getArtist(track.artists[0].id);
@@ -49,8 +48,7 @@ class SpotifyClient extends Spotify {
 
     let sortedUniqueGenreData = [];
 
-    for (let genreKey in uniqueGenreData)
-      sortedUniqueGenreData.push({ name: genreKey, count: uniqueGenreData[genreKey] });
+    for (let genreKey in uniqueGenreData) sortedUniqueGenreData.push({ name: genreKey, count: uniqueGenreData[genreKey] });
 
     sortedUniqueGenreData.sort((a, b) => {
       return b.count - a.count;

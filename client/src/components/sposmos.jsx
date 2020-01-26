@@ -39,8 +39,8 @@ class Sposmos extends Component {
     super();
 
     this.handleWindowResize = this.handleWindowResize.bind(this);
-    this.onDurationCheck = this.onDurationCheck.bind(this);
-    this.durationCheckTimerId = null;
+    this.onCurrentlyPlayingCheckIn = this.onCurrentlyPlayingCheckIn.bind(this);
+    this.checkInTimerId = null;
 
     this.page = null;
     this.setPage = element => {
@@ -142,20 +142,17 @@ class Sposmos extends Component {
   async handleGenreClick(hitDetectedGravitationalObject) {
     const { spotifyClient } = this.props;
 
+    //Find a playlist from the genre name
     const genreName = hitDetectedGravitationalObject.domain.genre.name;
     const playlists = await spotifyClient.searchPlaylists(`the sound of ${genreName}`);
     const playlist = playlists.playlists.items[0];
-    console.log(playlist);
     const playlistOffset = Math.min(Math.floor(Math.random() * 100), Math.floor(Math.random() * playlist.tracks.total - 1));
 
+    //Get a song to play from that genre offset by a random value
     const res = await spotifyClient.getPlaylistTracks(playlist.id, { offset: playlistOffset });
     const song = res.items[0].track;
-    console.log("playlist song", song);
-    await this.updateNewTrackDataAsync(song.id);
 
-    let currentTrackData = { ...this.state.currentTrackData };
-    currentTrackData.playlist = playlist;
-    this.setState({ currentTrackData: currentTrackData });
+    //Update state information necessary to get the player going
     this.setState({ playlistStartOffset: playlistOffset });
     this.setState({ currentUris: [playlist.uri] });
     this.setState({ playRequested: true });
@@ -174,8 +171,8 @@ class Sposmos extends Component {
 
   async handlePlayerStatusChange(state) {
     console.log("Player Status", state);
-    console.log("current traxk data", this.state.currentTrackData);
 
+    //If the web playback sdk is in error, we're broken. Navigate away.
     if (state.error) {
       this.props.history.push({
         pathname: "/issue",
@@ -183,32 +180,64 @@ class Sposmos extends Component {
       });
     }
 
+    //Cache the previously playing state and set the currently playing state based on the playback sdk.
     const previouslyPlaying = this.state.playing;
     this.setState({ playing: state.isPlaying });
-    // if (state.track && state.track.id != this.state.currentTrackData.id) {
-    //   await this.updateNewTrackDataAsync(state.track);
-    // }
 
-    if (state.isPlaying) {
-      this.setState({ currentTrackData: { ...this.state.currentTrackData, progressInSeconds: state.position } });
+    let trackDataRetrievalDelay = 0;
+    if (this.state.currentTrackData.id != state.track.id) {
+      const startDate = new Date();
+      await this.updateCurrentTrackDataFromIdAsync(state.track.id);
+      const endDate = new Date();
+      trackDataRetrievalDelay = (endDate.getTime() - startDate.getTime()) / 100;
     }
 
+    //If we're playing... update the state with the current track data
+    if (state.isPlaying) {
+      this.setState({ currentTrackData: { ...this.state.currentTrackData, progressInSeconds: state.position + trackDataRetrievalDelay } });
+    }
+
+    //If we're not playing... clear any potential timer's we had and update the state
     if (!state.isPlaying) {
-      clearInterval(this.durationCheckTimerId);
+      clearInterval(this.checkInTimerId);
       this.setState({ playRequested: false });
     }
+
+    //If we're playing but were not previously... we need to start the check in timer.
     if (state.isPlaying && !previouslyPlaying) {
-      try {
-        // await this.spotifyClient.setShuffle(true);
-      } catch (ex) {
-        console.log("shuffle issue", ex);
-      }
-      this.durationCheckTimerId = setInterval(this.onDurationCheck, 200);
-      console.log(this.state.currentTrackData.analysis);
+      console.log("setting interval");
+      this.checkInTimerId = setInterval(this.onCurrentlyPlayingCheckIn, 200);
     }
   }
 
-  onDurationCheck() {
+  async updateCurrentTrackDataFromIdAsync(trackId) {
+    console.log("updating track data");
+    const { spotifyClient } = this.props;
+
+    try {
+      const audioAnalysis = await spotifyClient.getAudioAnalysisForTrack(trackId);
+      const currentlyPlaying = await spotifyClient.getMyCurrentPlayingTrack();
+      let playlist = null;
+      if (currentlyPlaying.context.type == "playlist") {
+        const currentPlaylistId = currentlyPlaying.context.uri.split("playlist:")[1];
+        playlist = await spotifyClient.getPlaylist(currentPlaylistId);
+      }
+
+      const currentTrackData = {
+        ...this.state.currentTrackData,
+        id: trackId,
+        analysis: audioAnalysis,
+        progressInSeconds: 0,
+        playlist: playlist
+      };
+      this.setState({ currentTrackData });
+    } catch (ex) {
+      console.log("Issue grabbing track data", ex);
+      return;
+    }
+  }
+
+  onCurrentlyPlayingCheckIn() {
     const currentTrackData = { ...this.state.currentTrackData };
     currentTrackData.progressInSeconds += 0.2;
     this.setState({ currentTrackData });
@@ -218,6 +247,9 @@ class Sposmos extends Component {
 
   updateAudioAnalysisVisualizationEffects() {
     const currentTrackData = { ...this.state.currentTrackData };
+
+    //We can only perform visualization if we have the tracks audio analysis
+    if (!currentTrackData.analysis) return;
 
     //Get the audio analysis segment for the current timestamp (progress in seconds)
     let currentSegment = currentTrackData.analysis.segments.filter(
@@ -256,18 +288,6 @@ class Sposmos extends Component {
     for (let i = 0; i < this.simulationDriver.masses.length - 1; i++) {
       const mass = this.simulationDriver.masses[i];
       mass.domain.isPlaying = false;
-    }
-  }
-
-  async updateNewTrackDataAsync(trackId) {
-    const { spotifyClient } = this.props;
-    try {
-      const res = await spotifyClient.getAudioAnalysisForTrack(trackId);
-      const currentTrackData = { ...this.state.currentTrackData, id: trackId, analysis: res, progressInSeconds: 0 };
-      this.setState({ currentTrackData });
-    } catch (ex) {
-      console.log("Issue grabbing track data", ex);
-      return;
     }
   }
 
@@ -330,8 +350,6 @@ class Sposmos extends Component {
 
     let playlistName = "";
     if (currentTrackData.playlist) playlistName = currentTrackData.playlist.name;
-
-    console.log(playlistImageUrl);
 
     return (
       <div style={{ width: "100%", height: "100%" }}>
