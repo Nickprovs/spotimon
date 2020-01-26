@@ -6,7 +6,7 @@ var querystring = require("querystring");
 
 var client_id = "d89d162f2d3946269dcec2aa2d53be20"; // Your client id
 var client_secret = "d7b88624e20b4772b645816c94697306"; // Your secret
-var redirect_uri = `http://localhost:${process.env.PORT}/api/auth/callback`; // Your redirect uri
+var redirect_uri = "http://localhost/api/auth/serverCallback"; // Your redirect uri
 
 var stateKey = "spotify_auth_state";
 /**
@@ -43,7 +43,7 @@ router.get("/login", function(req, res) {
   );
 });
 
-router.get("/callback", function(req, res) {
+router.get("/serverCallback", function(req, res) {
   // your application requests refresh and access tokens
   // after checking the state parameter
 
@@ -92,7 +92,7 @@ router.get("/callback", function(req, res) {
 
         // we can also pass the token to the browser to make requests from there
         res.redirect(
-          `http://localhost:${process.env.PORT}/callback/#` +
+          `http://localhost/callback/#` +
             querystring.stringify({
               access_token: access_token,
               refresh_token: refresh_token
