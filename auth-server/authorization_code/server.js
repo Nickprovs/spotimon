@@ -32,7 +32,9 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/public/index.html"));
 });
 
-const server = app.listen(process.env.PORT || 80, () => {
+if (!process.env.PORT) throw new error("Port Env Variable Not Set. Port should be 80.");
+
+const server = app.listen(process.env.PORT, () => {
   const host = server.address().address;
   const port = server.address().port;
 
