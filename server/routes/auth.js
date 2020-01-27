@@ -6,7 +6,7 @@ var querystring = require("querystring");
 
 var client_id = "d89d162f2d3946269dcec2aa2d53be20"; // Your client id
 var client_secret = "d7b88624e20b4772b645816c94697306"; // Your secret
-var redirect_uri = "http://spotimon.appspot.com/api/auth/serverCallback"; // Your redirect uri
+var redirect_uri = "https://spotimon.com/api/auth/serverCallback"; // Your redirect uri
 
 var stateKey = "spotify_auth_state";
 /**
@@ -92,7 +92,7 @@ router.get("/serverCallback", function(req, res) {
 
         // we can also pass the token to the browser to make requests from there
         res.redirect(
-          `http://spotimon.appspot.com/callback/#` +
+          `https://spotimon.com/callback/#` +
             querystring.stringify({
               access_token: access_token,
               refresh_token: refresh_token
