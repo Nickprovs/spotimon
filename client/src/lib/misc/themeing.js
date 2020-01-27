@@ -5,7 +5,8 @@ export default class Theming {
     let darkModeOn = localStorage.getItem(darkModeKey);
     if (darkModeOn === null) {
       console.log("No theme data in browser local storage");
-      return false;
+      //This app looks best with dark mode on.
+      return true;
     } else {
       darkModeOn = JSON.parse(darkModeOn);
     }
