@@ -9,27 +9,15 @@ const client_secret = process.env.CLIENTSECRET; // Your secret
 
 const stateKey = "spotify_auth_state";
 
-console.log("server port", config.get("serverPort"));
-console.log("is server port equal to string 80: ", config.get("serverPort") === "80");
-
 const serverRedirectUri =
   process.env.NODE_ENV === "production"
     ? `${config.get("serverAddress")}/api/auth/serverCallback`
     : `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`;
 
-//serverOnPort80 ? serverUriWithoutPort : serverUriWithPort;
-
-//`${config.get("serverAddress")}/api/auth/serverCallback`;
-//"https://spotimon.com/api/auth/serverCallback";
-
 const clientUri =
   config.get("clientPort") === "80" ? config.get("clientAddress") : `${config.get("clientAddress")}:${config.get("clientPort")}`;
 const clientRedirectUri = `${clientUri}/callback/#`;
 const clientIssueUri = `${clientUri}/issue/#`;
-
-//URI Checks: Server and Client
-console.log(`Server Redirect Uri: ${serverRedirectUri}`);
-console.log(`Client Redirect Uri: ${clientRedirectUri}`);
 
 /**
  * Generates a random string containing numbers and letters
@@ -46,16 +34,10 @@ var generateRandomString = function(length) {
   return text;
 };
 
-router.get("/test", function(req, res) {
-  res.send(serverRedirectUri);
-});
-
 router.get("/login", function(req, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
 
-  console.log("logging in witht his redir ", serverRedirectUri);
-  // your application requests authorization
   var scope =
     "streaming user-read-private user-read-email user-read-playback-state user-top-read user-library-read user-modify-playback-state user-library-modify";
   res.redirect(
@@ -71,12 +53,6 @@ router.get("/login", function(req, res) {
 });
 
 router.get("/serverCallback", function(req, res) {
-  console.log("callback in witht his redir ", serverRedirectUri);
-
-  console.log("HEY");
-  // your application requests refresh and access tokens
-  // after checking the state parameter
-
   var code = req.query.code || null;
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
@@ -85,7 +61,7 @@ router.get("/serverCallback", function(req, res) {
   if (state === null || state !== storedState) {
     console.log("redirecting to " + clientUri);
     res.redirect(
-      `${clientUri}` +
+      `${clientIssueUri}` +
         querystring.stringify({
           error: "state_mismatch"
         })
