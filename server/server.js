@@ -8,7 +8,6 @@ const config = require("config");
 var app = express();
 app
   .use(cookieParser())
-  .use(express.static(__dirname + "/public"))
   .use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
@@ -39,6 +38,7 @@ require("./startup/routes")(app);
 //If the environment is production... we should host the static web app in the build dir
 if (process.env.NODE_ENV == "production") {
   console.log("Production Environment Detected: Hosting Static Web App");
+  app.use(express.static(__dirname + "/public"));
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname + "/public/index.html"));
   });
