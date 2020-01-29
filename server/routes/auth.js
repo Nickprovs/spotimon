@@ -10,7 +10,7 @@ const client_secret = "d7b88624e20b4772b645816c94697306"; // Your secret
 const stateKey = "spotify_auth_state";
 
 const serverRedirectUri =
-  config.get("serverPort") == 80
+  config.get("serverPort") === "80"
     ? `${config.get("serverAddress")}/api/auth/serverCallback`
     : `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`;
 
