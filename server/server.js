@@ -20,7 +20,11 @@ app
 if (!process.env.NODE_ENV)
   throw new Error("Must specify environment by setting the NODE_ENV environment variable before running this server");
 
-//Client Configuration Checks and Output
+//Client Id and Secret Envirnment Variable Checks
+if (!process.env.CLIENTID) throw new Error("CLIENTID Environment Variable Must Be Set");
+if (!process.env.CLIENTSECRET) throw new Error("CLIENTSECRET Environment Variable Must Be Set");
+
+//Client Redirect Configuration Checks and Output
 if (!config.has("clientAddress"))
   throw new Error("Client Address must be set either through config file or with env variable CLIENTADDRESS");
 if (!config.has("clientPort"))

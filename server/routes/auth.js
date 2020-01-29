@@ -4,8 +4,8 @@ const config = require("config");
 const request = require("request"); // "Request" library
 const querystring = require("querystring");
 
-const client_id = "d89d162f2d3946269dcec2aa2d53be20"; // Your client id
-const client_secret = "d7b88624e20b4772b645816c94697306"; // Your secret
+const client_id = process.env.CLIENTID; // Your client id
+const client_secret = process.env.CLIENTSECRET; // Your secret
 
 const stateKey = "spotify_auth_state";
 
