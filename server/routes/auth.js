@@ -16,7 +16,7 @@ const serverUriWithPort = `${config.get("serverAddress")}:${config.get("serverPo
 const serverUriWithoutPort = `${config.get("serverAddress")}/api/auth/serverCallback`;
 const serverOnPort80 = config.get("serverPort") === "80" || config.get("serverPort") === 80;
 let serverRedirectUri = "";
-if (serverOnPort80) serverRedirectUri = serverUriWithoutPort;
+if (!serverOnPort80) serverRedirectUri = serverUriWithoutPort;
 else serverRedirectUri = serverUriWithPort;
 
 //serverOnPort80 ? serverUriWithoutPort : serverUriWithPort;
