@@ -14,7 +14,8 @@ const serverRedirectUri =
     ? `${config.get("serverAddress")}/api/auth/serverCallback`
     : `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`;
 
-const clientUri = `${config.get("clientAddress")}:${config.get("clientPort")}`;
+const clientUri =
+  config.get("clientPort") === "80" ? config.get("clientAddress") : `${config.get("clientAddress")}:${config.get("clientPort")}`;
 const clientRedirectUri = `${clientUri}/callback/#`;
 const clientIssueUri = `${clientUri}/issue/#`;
 
