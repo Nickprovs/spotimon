@@ -9,11 +9,12 @@ const client_secret = "d7b88624e20b4772b645816c94697306"; // Your secret
 
 const stateKey = "spotify_auth_state";
 
-const serverRedirectUri =
-  "https://spotimon.com/api/auth/serverCallback"; /*
+const serverRedirectUri = `${config.get("serverAddress")}/api/auth/serverCallback`;
+//"https://spotimon.com/api/auth/serverCallback";
+/*
   config.get("serverPort") === "80"
     ? `${config.get("serverAddress")}/api/auth/serverCallback`
-    : `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`;*/
+    : `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`; */
 
 const clientUri =
   config.get("clientPort") === "80" ? config.get("clientAddress") : `${config.get("clientAddress")}:${config.get("clientPort")}`;
