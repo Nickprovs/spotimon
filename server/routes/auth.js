@@ -38,6 +38,10 @@ var generateRandomString = function(length) {
   return text;
 };
 
+router.get("/test", function(req, res) {
+  res.send("Server redirect uri: ", serverRedirectUri);
+});
+
 router.get("/login", function(req, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
