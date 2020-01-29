@@ -12,10 +12,10 @@ const stateKey = "spotify_auth_state";
 console.log("server port", config.get("serverPort"));
 console.log("is server port equal to string 80: ", config.get("serverPort") === "80");
 
-const serverRedirectUri =
-  config.get("serverPort") === "80"
-    ? `${config.get("serverAddress")}/api/auth/serverCallback`
-    : `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`;
+const serverUriWithPort = `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`;
+const serverUriWithoutPort = `${config.get("serverAddress")}/api/auth/serverCallback`;
+const serverOnPort80 = config.get("serverPort") === "80" || config.get("serverPort") === 80;
+const serverRedirectUri = serverOnPort80 ? serverUriWithoutPort : serverUriWithPort;
 
 //`${config.get("serverAddress")}/api/auth/serverCallback`;
 //"https://spotimon.com/api/auth/serverCallback";
