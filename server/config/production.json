@@ -1,6 +1,6 @@
 {
   "clientAddress": "https://spotimon.com",
   "clientPort": "80",
-  "serverAddress": "https://spotimon.com"
-  // "serverPort": ""
+  "serverAddress": "https://spotimon.com",
+  "serverPort": ""
 }
