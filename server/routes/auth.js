@@ -41,6 +41,7 @@ router.get("/login", function(req, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
 
+  console.log("logging in witht his redir ", serverRedirectUri);
   // your application requests authorization
   var scope =
     "streaming user-read-private user-read-email user-read-playback-state user-top-read user-library-read user-modify-playback-state user-library-modify";
@@ -57,6 +58,8 @@ router.get("/login", function(req, res) {
 });
 
 router.get("/serverCallback", function(req, res) {
+  console.log("callback in witht his redir ", serverRedirectUri);
+
   console.log("HEY");
   // your application requests refresh and access tokens
   // after checking the state parameter
