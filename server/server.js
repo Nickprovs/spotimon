@@ -28,8 +28,10 @@ if (!config.has("clientPort"))
 console.log(`Configured Client Info- Address: ${config.get("clientAddress")}, Port: ${config.get("clientPort")}`);
 
 //Server Configuration Checks and Output
+if (!config.has("serverAddress"))
+  throw new Error("Server Address should be set either through configuration file or with environment variable SERVERADDRESS");
 if (!config.has("serverPort"))
-  throw new Error("Server Port should be set either through configuration file or with env variable CLIENTPORT");
+  throw new Error("Server Port should be set either through configuration file or with the environment variable PORT");
 console.log(`Configured Server Info- Address: ${config.get("serverAddress")}, Port: ${config.get("serverPort")}`);
 
 //Registers our api routes
