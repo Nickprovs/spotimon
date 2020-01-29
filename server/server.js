@@ -44,5 +44,5 @@ if (process.env.NODE_ENV == "production") {
   });
 } else console.log("Non-Production Environment Detected: NOT Hosting Static Web App");
 
-const server = app.listen(config.get("serverPort"));
+const server = app.listen(80);
 module.exports = server;
