@@ -5,4 +5,4 @@ handlers:
     redirect_http_response_code: 301
     script: auto
 env_variables:
-  PORT: "80"
+  PORT: 80
