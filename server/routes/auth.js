@@ -1,14 +1,23 @@
 const express = require("express");
 const router = express.Router();
+const config = require("config");
+const request = require("request"); // "Request" library
+const querystring = require("querystring");
 
-var request = require("request"); // "Request" library
-var querystring = require("querystring");
+const client_id = "d89d162f2d3946269dcec2aa2d53be20"; // Your client id
+const client_secret = "d7b88624e20b4772b645816c94697306"; // Your secret
 
-var client_id = "d89d162f2d3946269dcec2aa2d53be20"; // Your client id
-var client_secret = "d7b88624e20b4772b645816c94697306"; // Your secret
-var redirect_uri = "https://spotimon.com/api/auth/serverCallback"; // Your redirect uri
+const stateKey = "spotify_auth_state";
 
-var stateKey = "spotify_auth_state";
+const serverRedirectUri = `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`;
+const clientUri = `${config.get("clientAddress")}:${config.get("clientPort")}`;
+const clientRedirectUri = `${clientUri}/callback/#`;
+const clientIssueUri = `${clientUri}/issue/#`;
+
+//URI Checks: Server and Client
+console.log(`Server Redirect Uri: ${serverRedirectUri}`);
+console.log(`Client Redirect Uri: ${clientRedirectUri}`);
+
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
@@ -37,7 +46,7 @@ router.get("/login", function(req, res) {
         response_type: "code",
         client_id: client_id,
         scope: scope,
-        redirect_uri: redirect_uri,
+        redirect_uri: serverRedirectUri,
         state: state
       })
   );
@@ -53,8 +62,9 @@ router.get("/serverCallback", function(req, res) {
   console.log("cookie from callback", req.headers.cookies);
 
   if (state === null || state !== storedState) {
+    console.log("redirecting to " + clientUri);
     res.redirect(
-      "/#" +
+      `${clientUri}` +
         querystring.stringify({
           error: "state_mismatch"
         })
@@ -65,7 +75,7 @@ router.get("/serverCallback", function(req, res) {
       url: "https://accounts.spotify.com/api/token",
       form: {
         code: code,
-        redirect_uri: redirect_uri,
+        redirect_uri: serverRedirectUri,
         grant_type: "authorization_code"
       },
       headers: {
@@ -92,7 +102,7 @@ router.get("/serverCallback", function(req, res) {
 
         // we can also pass the token to the browser to make requests from there
         res.redirect(
-          `https://spotimon.com/callback/#` +
+          clientRedirectUri +
             querystring.stringify({
               access_token: access_token,
               refresh_token: refresh_token
@@ -100,7 +110,7 @@ router.get("/serverCallback", function(req, res) {
         );
       } else {
         res.redirect(
-          "/#" +
+          `${clientIssueUri}` +
             querystring.stringify({
               error: "invalid_token"
             })

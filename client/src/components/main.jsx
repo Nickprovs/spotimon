@@ -11,6 +11,7 @@ import Issue from "./issue";
 import { withRouter, Route, Redirect, Switch } from "react-router-dom";
 import SpotifyClient from "../lib/http/spotifyClient";
 import authService from "../lib/http/authService";
+import { SERVERURI, LOGINURI } from "../constants";
 
 const tokenValidityTime = 3500000;
 
@@ -39,8 +40,7 @@ class Main extends Component {
 
   redirectIfOnInvalidPageForState() {
     console.log("mounted at", this.props.location.pathname);
-    if (this.props.location.pathname === "/simulation" && !this.state.accessToken)
-      this.props.history.push({ pathname: "/begin" });
+    if (this.props.location.pathname === "/simulation" && !this.state.accessToken) this.props.history.push({ pathname: "/begin" });
   }
 
   handleToggleTheme() {
@@ -111,28 +111,27 @@ class Main extends Component {
     const { accessToken } = this.state;
 
     return (
-      <Theme variables={theme}>
-        <div className="app-container">
-          <div className="nav-area">
-            <NavBar onThemeClick={this.handleToggleTheme.bind(this)} />
+      <div>
+        <Theme variables={theme}>
+          <div className="app-container">
+            <div className="nav-area">
+              <NavBar onThemeClick={this.handleToggleTheme.bind(this)} />
+            </div>
+            <div className="content-area">
+              <Switch>
+                <Route path="/playground" render={props => <Playground />} />
+                <Route path="/simulation" render={props => <Sposmos spotifyClient={this.spotifyClient} accessToken={accessToken} />} />
+                <Route path="/begin" render={props => <Begin />} />
+                <Route path="/callback" render={props => <Callback onCallback={this.handleCallback.bind(this)} />} />
+                <Route path="/issue" component={Issue} />
+                <Route path="/not-found" render={props => <NotFound />} />
+                <Redirect exact from="/" to="/begin" />
+                <Redirect to="/not-found" />
+              </Switch>
+            </div>
           </div>
-          <div className="content-area">
-            <Switch>
-              <Route path="/playground" render={props => <Playground />} />
-              <Route
-                path="/simulation"
-                render={props => <Sposmos spotifyClient={this.spotifyClient} accessToken={accessToken} />}
-              />
-              <Route path="/begin" render={props => <Begin />} />
-              <Route path="/callback" render={props => <Callback onCallback={this.handleCallback.bind(this)} />} />
-              <Route path="/issue" component={Issue} />
-              <Route path="/not-found" render={props => <NotFound />} />
-              <Redirect exact from="/" to="/begin" />
-              <Redirect to="/not-found" />
-            </Switch>
-          </div>
-        </div>
-      </Theme>
+        </Theme>
+      </div>
     );
   }
 }

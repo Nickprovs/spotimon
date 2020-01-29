@@ -1,5 +1,6 @@
 import React from "react";
 import StandardButton from "./common/standardButton";
+import { LOGINURI } from "../constants";
 
 const Begin = () => {
   return (
@@ -52,7 +53,7 @@ const Begin = () => {
             </ul> */}
       <div className="enter-area">
         <div className="enter-button-container">
-          <a href="https://spotimon.com/api/auth/login">
+          <a href={LOGINURI}>
             <StandardButton>Login With Spotify</StandardButton>
           </a>
         </div>

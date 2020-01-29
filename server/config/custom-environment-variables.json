@@ -1,0 +1,6 @@
+{
+  "clientAddress": "CLIENTADDRESS",
+  "clientPort": "CLIENTPORT",
+  "serverPort": "PORT",
+  "serverAddress": "SERVERADDRESS"
+}

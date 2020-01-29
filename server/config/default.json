@@ -1,0 +1,6 @@
+{
+  "clientAddress": "http://localhost",
+  "clientPort": "3000",
+  "serverAddress": "http://localhost",
+  "serverPort": "5000"
+}
