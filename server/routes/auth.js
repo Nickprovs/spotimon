@@ -15,7 +15,7 @@ console.log("is server port equal to string 80: ", config.get("serverPort") === 
 const serverUriWithPort = `${config.get("serverAddress")}:${config.get("serverPort")}/api/auth/serverCallback`;
 const serverUriWithoutPort = `${config.get("serverAddress")}/api/auth/serverCallback`;
 const serverOnPort80 = config.get("serverPort") === "80" || config.get("serverPort") === 80;
-const serverRedirectUri = serverOnPort80 ? serverUriWithoutPort : serverUriWithPort;
+const serverRedirectUri = `${config.get("serverAddress")}/api/auth/serverCallback`; //serverOnPort80 ? serverUriWithoutPort : serverUriWithPort;
 
 //`${config.get("serverAddress")}/api/auth/serverCallback`;
 //"https://spotimon.com/api/auth/serverCallback";
