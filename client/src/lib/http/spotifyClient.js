@@ -7,35 +7,29 @@ class SpotifyClient extends Spotify {
 
   async getSavedTracksAsync(totalPullCount = 300) {
     let likedTracks = [];
-    try {
-      let limit = Math.min(50, totalPullCount);
+    let limit = Math.min(50, totalPullCount);
 
-      const resTotal = await this.getMySavedTracks();
-      const totalSavedCount = resTotal.total;
+    const resTotal = await this.getMySavedTracks();
+    const totalSavedCount = resTotal.total;
 
-      const asyncGetTracksCalls = [];
-      for (let i = 0; i * limit < totalPullCount && i * limit < totalSavedCount; i++) {
-        asyncGetTracksCalls.push(this.getMySavedTracks({ offset: i * limit, limit: limit }));
-      }
-      const totalRes = await Promise.all(asyncGetTracksCalls);
-      for (const res of totalRes) likedTracks.push(...res.items.map(o => o.track));
-    } catch (ex) {
-      console.log(ex);
+    const asyncGetTracksCalls = [];
+    for (let i = 0; i * limit < totalPullCount && i * limit < totalSavedCount; i++) {
+      asyncGetTracksCalls.push(this.getMySavedTracks({ offset: i * limit, limit: limit }));
     }
+    const totalRes = await Promise.all(asyncGetTracksCalls);
+    for (const res of totalRes) likedTracks.push(...res.items.map(o => o.track));
+
     return likedTracks;
   }
 
   async getArtistsFromTracksAsync(tracks) {
     let artists = [];
-    try {
-      for (let track of tracks) {
-        const res = await this.getArtist(track.artists[0].id);
-        artists.push(res);
-      }
-    } catch (ex) {
-      console.log(ex);
+    const asyncGetArtistCalls = [];
+    for (const track of tracks) {
+      asyncGetArtistCalls.push(this.getArtist(track.artists[0].id));
     }
-    return artists;
+    const totalRes = await Promise.all(asyncGetArtistCalls);
+    return totalRes;
   }
 
   getUniqueGenreDataFromArtists(artists) {
@@ -57,18 +51,6 @@ class SpotifyClient extends Spotify {
     });
 
     return sortedUniqueGenreData;
-  }
-
-  async getNowPlayingAsync() {
-    try {
-      const res = await this.getMyCurrentPlaybackState();
-      return {
-        name: res.item.name,
-        image: res.item.album.images[0].url
-      };
-    } catch (ex) {
-      console.log(ex);
-    }
   }
 }
 

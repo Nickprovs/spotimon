@@ -102,19 +102,16 @@ class Sposmos extends Component {
     window.removeEventListener("resize", this.handleWindowResize);
   }
 
-  async handleGetNowPlaying() {
-    const { spotifyClient } = this.props;
-    const nowPlaying = await spotifyClient.getNowPlayingAsync();
-    if (nowPlaying) this.setState({ nowPlaying });
-  }
-
   async fetchGenres() {
     let uniqueGenreData = [];
     const { spotifyClient } = this.props;
-
     this.setState({ fetchingGenres: true });
+
     try {
+      //Get recent saved tracks
       const savedTracks = await spotifyClient.getSavedTracksAsync(300);
+
+      //The user must have a small number of saved tracks or else this app won't look right
       if (savedTracks.length < 20) {
         this.props.history.push({
           pathname: "/issue",
@@ -123,13 +120,14 @@ class Sposmos extends Component {
         return;
       }
 
+      //Get artists from the tracks and genres from the artists
       const savedArtists = await spotifyClient.getArtistsFromTracksAsync(savedTracks);
       uniqueGenreData = spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
     } catch (ex) {
-      console.error(ex);
+      //If there is an error or api change... redirect to an issue page
       this.props.history.push({
         pathname: "/issue",
-        state: { issueHeader: `You must have at least 20 liked / saved songs to continue.`, issueBody: ex }
+        state: { issueHeader: `Error retrieving or parsing data from spotify.` }
       });
       return;
     } finally {
