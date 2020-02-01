@@ -354,8 +354,9 @@ class Sposmos extends Component {
 
     return (
       <div style={{ width: "100%", height: "100%" }}>
-        <div style={{ visibility: fetchingGenres ? "visible" : "hidden" }} className="spinner-container">
+        <div style={{ visibility: fetchingGenres ? "visible" : "hidden" }} className="loading-container">
           <Spinner />
+          <label className="standard-text loading-text">This may take a little while...</label>
         </div>
 
         <div className="simulator-container dashboard-text" style={{ width: "100%", height: "100%" }} ref={this.setPage}>

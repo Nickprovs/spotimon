@@ -193,8 +193,16 @@ li:first-child {
   cursor: pointer;
 }
 
-.spinner-container {
+.loading-container {
   position: absolute;
-  bottom: calc(50% - 40px);
-  left: calc(50% - 40px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 80%;
+  flex-direction: column;
+}
+
+.loading-text {
+  font-size: 3vmin;
 }
