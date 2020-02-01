@@ -120,6 +120,7 @@ class Sposmos extends Component {
           pathname: "/issue",
           state: { issueHeader: `You must have at least 20 liked / saved songs to continue.` }
         });
+        return;
       }
 
       const savedArtists = await spotifyClient.getArtistsFromTracksAsync(savedTracks);

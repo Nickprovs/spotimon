@@ -10,13 +10,15 @@ class SpotifyClient extends Spotify {
     try {
       let limit = Math.min(50, totalPullCount);
 
-      const res = await this.getMySavedTracks();
-      const totalSavedCount = res.total;
+      const resTotal = await this.getMySavedTracks();
+      const totalSavedCount = resTotal.total;
 
+      const asyncGetTracksCalls = [];
       for (let i = 0; i * limit < totalPullCount && i * limit < totalSavedCount; i++) {
-        const res = await this.getMySavedTracks({ offset: i * limit, limit: limit });
-        likedTracks.push(...res.items.map(o => o.track));
+        asyncGetTracksCalls.push(this.getMySavedTracks({ offset: i * limit, limit: limit }));
       }
+      const totalRes = await Promise.all(asyncGetTracksCalls);
+      for (const res of totalRes) likedTracks.push(...res.items.map(o => o.track));
     } catch (ex) {
       console.log(ex);
     }
