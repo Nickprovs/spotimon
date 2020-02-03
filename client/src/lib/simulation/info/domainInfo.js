@@ -1,10 +1,10 @@
 export default class DomainInfo {
   static getDefaultBasslineMassFromGenreCount(genreCount) {
-    return 3.0024584e-6 * Math.pow(genreCount, 3.33);
+    return 3.0024584e-6 * Math.pow(3 * genreCount, 3.33);
   }
 
   static getDefaultBasslineRadiusFromGenreCount(genreCount) {
-    return 0.5 * genreCount;
+    return 3 * genreCount;
   }
 
   constructor(domainArgs) {

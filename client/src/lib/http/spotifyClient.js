@@ -12,24 +12,26 @@ class SpotifyClient extends Spotify {
     const resTotal = await this.getMySavedTracks();
     const totalSavedCount = resTotal.total;
 
-    const asyncGetTracksCalls = [];
     for (let i = 0; i * limit < totalPullCount && i * limit < totalSavedCount; i++) {
-      asyncGetTracksCalls.push(this.getMySavedTracks({ offset: i * limit, limit: limit }));
+      const result = await this.getMySavedTracks({ offset: i * limit, limit: limit });
+      likedTracks.push(...result.items.map(o => o.track));
     }
-    const totalRes = await Promise.all(asyncGetTracksCalls);
-    for (const res of totalRes) likedTracks.push(...res.items.map(o => o.track));
 
     return likedTracks;
   }
 
-  async getArtistsFromTracksAsync(tracks) {
-    let artists = [];
-    const asyncGetArtistCalls = [];
-    for (const track of tracks) {
-      asyncGetArtistCalls.push(this.getArtist(track.artists[0].id));
+  async getMyTopArtistsAsync(totalPullCount = 50) {
+    let myTopArtists = [];
+    let limit = Math.min(50, totalPullCount);
+
+    const resTotal = await this.getMyTopArtists();
+    const myTopArtistsCount = resTotal.total;
+
+    for (let i = 0; i * limit < totalPullCount && i * limit < myTopArtistsCount; i++) {
+      const result = await this.getMyTopArtists({ offset: i * limit, limit: limit });
+      myTopArtists.push(...result.items);
     }
-    const totalRes = await Promise.all(asyncGetArtistCalls);
-    return totalRes;
+    return myTopArtists;
   }
 
   getUniqueGenreDataFromArtists(artists) {

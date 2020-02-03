@@ -30,7 +30,6 @@ const Begin = () => {
             Requirements
             <ul>
               <li>Spotify Premium</li>
-              <li>"Liked Songs" Playlist must have content.</li>
             </ul>
           </li>
           <li>

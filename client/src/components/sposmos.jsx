@@ -108,26 +108,23 @@ class Sposmos extends Component {
     this.setState({ fetchingGenres: true });
 
     try {
-      //Get recent saved tracks
-      const savedTracks = await spotifyClient.getSavedTracksAsync(300);
-
-      //The user must have a small number of saved tracks or else this app won't look right
-      if (savedTracks.length < 20) {
+      //Get my top artists
+      const myTopArtists = await spotifyClient.getMyTopArtistsAsync(50);
+      if (myTopArtists.length < 10) {
         this.props.history.push({
           pathname: "/issue",
-          state: { issueHeader: `You must have at least 20 liked / saved songs to continue.` }
+          state: { issueHeader: `You must have listened to at least 10 artists to use this app.` }
         });
         return;
       }
 
-      //Get artists from the tracks and genres from the artists
-      const savedArtists = await spotifyClient.getArtistsFromTracksAsync(savedTracks);
-      uniqueGenreData = spotifyClient.getUniqueGenreDataFromArtists(savedArtists);
+      uniqueGenreData = spotifyClient.getUniqueGenreDataFromArtists(myTopArtists);
     } catch (ex) {
+      console.log(ex);
       //If there is an error or api change... redirect to an issue page
       this.props.history.push({
         pathname: "/issue",
-        state: { issueHeader: `Error retrieving or parsing data from spotify.` }
+        state: { issueHeader: `Error retrieving or parsing data from spotify.`, issueBody: ex }
       });
       return;
     } finally {
@@ -397,7 +394,7 @@ class Sposmos extends Component {
                   step={0.000001}
                   min={0.00001}
                   value={0.0005}
-                  max={0.002}
+                  max={0.01}
                   onChange={this.handleDeltaTChange.bind(this)}
                   style={{ margin: "10px" }}
                 />
