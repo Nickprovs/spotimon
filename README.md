@@ -40,17 +40,18 @@
 
 ## About The Project
 
-spotimon uses analytics available to premium members to build a universe based on many of the genres a user listens to.
+spotimon uses premium analytics to gather genres a user listens to.
 It then generates a planetary system where genres are represented as celestial bodies.
 An n-body simulation is used to put the universe in motion.
+Both time and the current genre will "bump" to the music via analysis of the track's audio features.
 
-Time and the masses of the system can be altered. This site also has a light and a dark theme.
+Time and masses of the system can be altered. This site also has a light and a dark theme.
 
 [![Product Name Screen Shot][product-screenshot]](/_meta/sample.jpg)
 
 ### Built With
 
-- react.js
+- [react.js](https://github.com/facebook/react)
 - [react-spotify-web-playback](https://github.com/gilbarbara/react-spotify-web-playback)
 - [spotify web-api](https://github.com/spotify/web-api)
 
