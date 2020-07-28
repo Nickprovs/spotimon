@@ -65,7 +65,7 @@ Time and masses of the system can be altered. This site also has a light and a d
 git clone https://github.com/Nickprovs/spotimon.git
 ```
 
-2. Open both the client and server folders in a new terminal.
+2. Open both the client and server folders in new terminals.
 
 3. Install Dependencies.
 
